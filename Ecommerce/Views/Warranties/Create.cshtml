@@ -1,0 +1,58 @@
+﻿@model Ecommerce.Models.Warranty
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>Warranty</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RollNumber" class="control-label"></label>
+                <input asp-for="RollNumber" class="form-control" readonly />
+                <span asp-validation-for="RollNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarrantyStartDate" class="control-label"></label>
+                <input asp-for="WarrantyStartDate" class="form-control" />
+                <span asp-validation-for="WarrantyStartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarrantyEndDate" class="control-label"></label>
+                <input asp-for="WarrantyEndDate" class="form-control" />
+                <span asp-validation-for="WarrantyEndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductId" class="control-label"></label>
+                <select asp-for="ProductId" class ="form-control" asp-items="ViewBag.ProductId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerId" class="control-label"></label>
+                <select asp-for="CustomerId" class ="form-control" asp-items="ViewBag.CustomerId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="DealerId" class="control-label"></label>
+                <select asp-for="DealerId" class ="form-control" asp-items="ViewBag.DealerId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

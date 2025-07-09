@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Ecommerce.Models.Warranty>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RollNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WarrantyStartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WarrantyEndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Product)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dealer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RollNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WarrantyStartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WarrantyEndDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Product.ProductId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dealer.DealerName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.WarrantyId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.WarrantyId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.WarrantyId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

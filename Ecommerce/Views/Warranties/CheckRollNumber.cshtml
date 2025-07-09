@@ -1,0 +1,27 @@
+﻿@model Ecommerce.Models.Warranty
+
+@{
+    ViewData["Title"] = "Check Roll Number";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2>Check Roll Number</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-warning">@TempData["Message"]</div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <form asp-action="CheckRollNumber" method="post">
+        <div class="form-group">
+            <label for="RollNumber">Roll Number</label>
+            <input type="text" class="form-control" id="RollNumber" name="RollNumber" required />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Check</button>
+    </form>
+</div>
