@@ -32,8 +32,8 @@ namespace Ecommerce.Models
 
         public virtual Category? Category { get; set; }
 
-        // 1:1 Relationship with Warranty
-        public virtual Warranty? Warranty { get; set; }
+        public virtual ICollection<Warranty> Warranties { get; set; } = new List<Warranty>();
+
 
         public virtual ICollection<Cart> Carts { get; set; }
     }

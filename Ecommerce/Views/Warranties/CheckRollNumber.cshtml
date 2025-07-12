@@ -4,7 +4,7 @@
     ViewData["Title"] = "Check Roll Number";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@* 
 <div class="container mt-5">
     <h2>Check Roll Number</h2>
 
@@ -24,4 +24,44 @@
         </div>
         <button type="submit" class="btn btn-primary mt-2">Check</button>
     </form>
+</div> *@
+
+
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="col-md-6">
+            <div class="p-4" style="background-color: #6d36e4; border-radius: 8px; color: white; text-align: center;">
+                <h1 class="my-h1">Product Roll Number</h1>
+            </div>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-warning">@TempData["Message"]</div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <div class="p-4 mt-3" style="background-color: #fff; border-radius: 8px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);">
+                <form asp-action="CheckRollNumber" asp-controller="Warranties" method="post">
+
+                    <div class="mb-3">
+                        <label for="RollNumber" class="form-label">RollNumber:</label>
+                        <input type="text" id="rollNumber" name="rollNumber" class="form-control" value="@Model.RollNumber" />
+                        <span asp-validation-for="RollNumber" class="text-danger"></span>
+                    </div>
+                    
+
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary" style="background-color:#6d36e4;">Submit</button>
+                    </div>
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <p style="color: green; text-align: center;">@TempData["SuccessMessage"]</p>
+
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

@@ -17,7 +17,7 @@ namespace Ecommerce.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -216,8 +216,7 @@ namespace Ecommerce.Migrations
 
                     b.HasIndex("DealerId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Warranties");
                 });
@@ -263,8 +262,8 @@ namespace Ecommerce.Migrations
                         .IsRequired();
 
                     b.HasOne("Ecommerce.Models.Product", "Product")
-                        .WithOne("Warranty")
-                        .HasForeignKey("Ecommerce.Models.Warranty", "ProductId")
+                        .WithMany("Warranties")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -294,7 +293,7 @@ namespace Ecommerce.Migrations
                 {
                     b.Navigation("Carts");
 
-                    b.Navigation("Warranty");
+                    b.Navigation("Warranties");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ecommerce.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedWarranties : Migration
+    public partial class Intiial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -182,8 +182,7 @@ namespace Ecommerce.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Warranties_ProductId",
                 table: "Warranties",
-                column: "ProductId",
-                unique: true);
+                column: "ProductId");
         }
 
         /// <inheritdoc />

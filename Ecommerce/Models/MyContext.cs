@@ -17,10 +17,11 @@ namespace Ecommerce.Models
                 .Property(p => p.Price)
                 .HasPrecision(18, 2);
 
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.Warranty)
-                .WithOne(w => w.Product)
-                .HasForeignKey<Warranty>(w => w.ProductId);
+            modelBuilder.Entity<Warranty>()
+                .HasOne(w => w.Product)
+                .WithMany(p => p.Warranties)
+                .HasForeignKey(w => w.ProductId)
+                .IsRequired();
 
             modelBuilder.Entity<Warranty>()
                 .HasOne(w => w.Customer)
