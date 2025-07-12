@@ -11,7 +11,7 @@ namespace Ecommerce.Models
         [Required]
         public string RollNumber { get; set; }
 
-        public int Status { get; set; }
+        public int Status { get; set; } // -1 = registered, 1 = pending, 0 = valid
 
         public DateTime WarrantyStartDate { get; set; }
         public DateTime WarrantyEndDate { get; set; }

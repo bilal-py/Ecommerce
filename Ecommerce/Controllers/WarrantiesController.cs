@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -21,15 +20,18 @@ namespace Ecommerce.Controllers
         // GET: Warranties
         public async Task<IActionResult> Index()
         {
-            var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer).Include(w => w.Product);
-            return View(await myContext.ToListAsync());
-        }
+            var warranties = _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.Product);
 
+            return View(await warranties.ToListAsync());
+        }
 
         // GET: Warranties/CheckRollNumber
         public IActionResult CheckRollNumber()
         {
-            return View();
+            return View(new Warranty());
         }
 
         // POST: Warranties/CheckRollNumber
@@ -40,39 +42,45 @@ namespace Ecommerce.Controllers
             if (string.IsNullOrWhiteSpace(warranty.RollNumber))
             {
                 TempData["Message"] = "Please enter a Roll Number.";
-                return View();
+                return View(new Warranty());
             }
 
-            var exists = _context.Warranties.Any(w => w.RollNumber == warranty.RollNumber);
+            var existing = _context.Warranties.FirstOrDefault(w => w.RollNumber == warranty.RollNumber);
 
-            if (exists)
+            if (existing != null)
             {
-                TempData["Message"] = "Roll Number already exists in the system!";
-                return RedirectToAction("CheckRollNumber");
+                switch (existing.Status)
+                {
+                    case -1:
+                        TempData["Message"] = "Roll Number already registered.";
+                        return RedirectToAction("CheckRollNumber");
+                    case 1:
+                        TempData["Message"] = "Roll Number is in pending status.";
+                        return RedirectToAction("CheckRollNumber");
+                    case 0:
+                        TempData["SuccessMessage"] = "Roll Number is valid! You can now create the warranty.";
+                        return RedirectToAction("Create", new { rollNumber = warranty.RollNumber });
+                }
             }
 
             TempData["SuccessMessage"] = "Roll Number is valid! You can now create the warranty.";
-
-            return RedirectToAction("Create", "Warranties", new { rollNumber = warranty.RollNumber });
+            return RedirectToAction("Create", new { rollNumber = warranty.RollNumber });
         }
 
         // GET: Warranties/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Warranties == null)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
             var warranty = await _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
                 .Include(w => w.Product)
                 .FirstOrDefaultAsync(m => m.WarrantyId == id);
+
             if (warranty == null)
-            {
                 return NotFound();
-            }
 
             return View(warranty);
         }
@@ -80,25 +88,18 @@ namespace Ecommerce.Controllers
         // GET: Warranties/Create
         public IActionResult Create(string? rollNumber)
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email");
-            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName");
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductId");
+            PopulateDropDowns();
 
-            var model = new Warranty();
-
-            if (!string.IsNullOrEmpty(rollNumber))
+            var model = new Warranty
             {
-                model.RollNumber = rollNumber;
-            }
+                RollNumber = rollNumber ?? string.Empty
+            };
 
             return View(model);
         }
 
         // POST: Warranties/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ActionName("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("WarrantyId,RollNumber,Status,WarrantyStartDate,WarrantyEndDate,ProductId,CustomerId,DealerId")] Warranty warranty)
         {
@@ -109,42 +110,32 @@ namespace Ecommerce.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email", warranty.CustomerId);
-            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductId", warranty.ProductId);
+
+            PopulateDropDowns(warranty);
             return View(warranty);
         }
 
         // GET: Warranties/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Warranties == null)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
             var warranty = await _context.Warranties.FindAsync(id);
             if (warranty == null)
-            {
                 return NotFound();
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email", warranty.CustomerId);
-            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductId", warranty.ProductId);
+
+            PopulateDropDowns(warranty);
             return View(warranty);
         }
 
         // POST: Warranties/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("WarrantyId,RollNumber,Status,WarrantyStartDate,WarrantyEndDate,ProductId,CustomerId,DealerId")] Warranty warranty)
         {
             if (id != warranty.WarrantyId)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -156,39 +147,31 @@ namespace Ecommerce.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!WarrantyExists(warranty.WarrantyId))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email", warranty.CustomerId);
-            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
-            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductId", warranty.ProductId);
+
+            PopulateDropDowns(warranty);
             return View(warranty);
         }
 
         // GET: Warranties/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Warranties == null)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
             var warranty = await _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
                 .Include(w => w.Product)
                 .FirstOrDefaultAsync(m => m.WarrantyId == id);
+
             if (warranty == null)
-            {
                 return NotFound();
-            }
 
             return View(warranty);
         }
@@ -198,23 +181,25 @@ namespace Ecommerce.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Warranties == null)
-            {
-                return Problem("Entity set 'MyContext.Warranties'  is null.");
-            }
             var warranty = await _context.Warranties.FindAsync(id);
             if (warranty != null)
             {
                 _context.Warranties.Remove(warranty);
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool WarrantyExists(Guid id)
         {
-          return (_context.Warranties?.Any(e => e.WarrantyId == id)).GetValueOrDefault();
+            return _context.Warranties.Any(e => e.WarrantyId == id);
+        }
+
+        private void PopulateDropDowns(Warranty? warranty = null)
+        {
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email", warranty?.CustomerId);
+            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty?.DealerId);
+            ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Name", warranty?.ProductId);
         }
     }
 }
