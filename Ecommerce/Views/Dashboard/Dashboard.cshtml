@@ -1,0 +1,123 @@
+﻿
+@{
+    ViewData["Title"] = "User Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    .nav-link {
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background 0.2s, color 0.2s;
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+
+        .nav-link:hover {
+            background-color: #343a40;
+            color: #ffd700 !important;
+        }
+
+        .nav-link i {
+            width: 20px;
+        }
+
+    body {
+        background: linear-gradient(135deg, #212529, #ffffff); /* Elegant dark gradient */ 
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        padding-top: 80px;
+        min-height: 100vh;
+      
+    }
+</style>
+<html>
+<head>
+    <!-- Site made with Mobirise Website Builder v5.7.12, https://mobirise.com -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="generator" content="Mobirise v5.7.12, mobirise.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <link rel="shortcut icon" href="~/assets/images/logo5.png" type="image/x-icon">
+    <meta name="description" content="">
+
+
+    <title>Home</title>
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
+
+</head>
+<body style="padding-top: 80px;">
+
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            <!-- Left Sidebar (Vertical Menu) -->
+
+            <!-- Sidebar -->
+            <div class="d-flex flex-column bg-dark text-white p-4 vh-100" style="width: 300px;">
+                                <h3 class="text-primary">Welcome Username</h3>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/WarrantyRegistration')">
+                    <i class="fas fa-cogs"></i> Warranty Registration
+                </a>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/WarrantyPending')">
+                    <i class="fas fa-table"></i> Warranty Pending
+                </a>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/WarrantyApproved')">
+                    <i class="fas fa-th"></i> Warranty Approved
+                </a>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/ExpiredWarranty')">                
+                    <i class="fas fa-info-circle"></i> Expired Warranty
+                </a>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/Settings')">
+                    <i class="fas fa-sliders-h"></i> Settings
+                </a>
+                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/Account')">
+                    <i class="fas fa-sliders-h"></i> Account
+                </a>
+            </div>
+            <!-- Right Content Area -->
+            <div class="col-md-8 col-lg-9 p-4" id="subview-container">
+                <!-- Partial views will load here -->
+                <div class="text-muted">Please select an option from the left menu.</div>
+            </div>
+
+
+
+
+
+
+    <div id="subview-container" style="display: none;"></div>
+    <div id="subview-container1" style="display: none;"></div>
+    <div id="subview-container2" style="display: none;"></div>
+  </div>
+  </div>
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function loadSubview(url) {
+        $("#subview-container").load(url, function () {
+                $("#subview-container").fadeIn("fast");
+            $("#subview-container1, #subview-container2").fadeOut("fast");
+        });
+    }
+
+    function loadSubview1(url) {
+        $("#subview-container1").load(url, function () {
+            $("#subview-container1").fadeIn("fast");
+            $("#subview-container, #subview-container2").fadeOut("fast");
+        });
+    }
+
+    function loadSubview2(url) {
+        $("#subview-container2").load(url, function () {
+            $("#subview-container2").fadeIn("fast");
+            $("#subview-container, #subview-container1").fadeOut("fast");
+        });
+    }
+</script>

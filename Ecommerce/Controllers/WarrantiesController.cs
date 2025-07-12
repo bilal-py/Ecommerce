@@ -5,17 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.Models;
+using Ecommerce.Services;
 
 namespace Ecommerce.Controllers
 {
     public class WarrantiesController : Controller
     {
         private readonly MyContext _context;
+        private readonly IEmailService _emailService;
 
-        public WarrantiesController(MyContext context)
+        public WarrantiesController(MyContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
+
 
         // GET: Warranties
         public async Task<IActionResult> Index()
@@ -108,6 +112,7 @@ namespace Ecommerce.Controllers
                 warranty.WarrantyId = Guid.NewGuid();
                 _context.Add(warranty);
                 await _context.SaveChangesAsync();
+                await SendEmailsAsync(warranty);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -200,6 +205,39 @@ namespace Ecommerce.Controllers
             ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "Email", warranty?.CustomerId);
             ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty?.DealerId);
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "Name", warranty?.ProductId);
+        }
+
+        private async Task SendEmailsAsync(Warranty? warranty = null)
+        {
+            var customer = await _context.Customers.FindAsync(warranty.CustomerId);
+            var product = await _context.Products.FindAsync(warranty.ProductId);
+            var dealer = await _context.Dealers.FindAsync(warranty.DealerId);
+
+            var warrantyDetails = $"<br>Warranty Start: {warranty.WarrantyStartDate:dd/MM/yyyy}" +
+                                  $"<br>End: {warranty.WarrantyEndDate:dd/MM/yyyy}" +
+                                  $"<br>Roll No: {warranty.RollNumber}";
+
+            // Send to Customer
+            await _emailService.SendEmailAsync(
+                customer.Email,
+                "Warranty Registered",
+                $"Dear {customer.CustomerName},<br>Your warranty for <strong>{product.Name}</strong> has been registered.{warrantyDetails}"
+            );
+
+            // Send to Dealer
+            await _emailService.SendEmailAsync(
+                dealer.Email,
+                "New Warranty Registered",
+                $"A new warranty has been registered for Product ID: <strong>{product.ProductId}</strong>.<br>{warrantyDetails}"
+            );
+
+            // Send to Admin
+            await _emailService.SendEmailAsync(
+                "admin@example.com",  // Admin ???? 
+                "Warranty Registered",
+                $"A warranty has been registered for Product ID: <strong>{product.ProductId}</strong>.<br>{warrantyDetails}"
+            );
+
         }
     }
 }

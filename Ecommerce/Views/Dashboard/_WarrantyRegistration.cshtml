@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "WarrantyRegistration";
+}
+
+@{
+    Layout = null; // No layout for AJAX-loaded partial
+}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-12 col-lg-8">
+        <div class="container bg-white shadow p-4 rounded">
+            <h3 class="text-center mb-4 fw-bold">Warranty Card</h3>
+
+            <!-- Sr No -->
+            <div class="mb-3">
+                <label class="form-label">Sr No.:</label>
+                <input type="text" class="form-control form-control-sm">
+            </div>
+
+            <!-- Customer Details -->
+            <h5 class="mt-4">Customer Details “Buying” Information</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">State/Province</label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Zip</label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cell <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <!-- Vehicle Info -->
+            <h5 class="mt-5">Vehicle Information</h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Year <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Make</label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Model <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">VIN <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <!-- Packages -->
+            <h5 class="mt-5">Packages</h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="wrapFull">
+                        <label class="form-check-label" for="wrapFull">Vehicle Wrap – Full</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="frontFull">
+                        <label class="form-check-label" for="frontFull">Front – Full</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="frontEdge">
+                        <label class="form-check-label" for="frontEdge">Front – Leading Edge</label>
+                    </div>
+                </div>
+
+                <!-- Individual Areas -->
+                <div class="col-md-9">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="bumpersFront"><label class="form-check-label" for="bumpersFront">Bumpers – Front</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="hoodLead"><label class="form-check-label" for="hoodLead">Hood – Leading Edge</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="mirrors"><label class="form-check-label" for="mirrors">Mirrors</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="bumpersBack"><label class="form-check-label" for="bumpersBack">Bumpers – Back</label></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="edgeGuard"><label class="form-check-label" for="edgeGuard">Doors – Edge Guard</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="windshield"><label class="form-check-label" for="windshield">Windshield – Pillars</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="fendersLead"><label class="form-check-label" for="fendersLead">Fenders – Leading Edge</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="roofFull"><label class="form-check-label" for="roofFull">Roof – Full</label></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="hoodFull"><label class="form-check-label" for="hoodFull">Hood – Full</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="roofLead"><label class="form-check-label" for="roofLead">Roof – Leading Edge</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="headlamps"><label class="form-check-label" for="headlamps">Headlamps*</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="trunk"><label class="form-check-label" for="trunk">Trunk – Area</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
