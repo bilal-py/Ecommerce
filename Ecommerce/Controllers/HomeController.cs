@@ -19,8 +19,6 @@ namespace Ecommerce.Controllers
         {
             var categories = _dbContext.Categories.ToList();
             ViewBag.categories = categories;
-            var products = _dbContext.Products.Include(p => p.Category).ToList();
-            ViewBag.products = products;
 
             return View(categories);
         }

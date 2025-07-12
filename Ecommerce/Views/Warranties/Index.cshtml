@@ -26,13 +26,59 @@
                 @Html.DisplayNameFor(model => model.WarrantyEndDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Product)
+                @Html.DisplayNameFor(model => model.VehicleYear)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VehicleMake)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VehicleModel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VehicleVIN)
+            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.Customer)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Dealer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BumpersFront)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HoodLead)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mirrors)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BumpersBack)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EdgeGuard)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Windshield)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FendersLead)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoofFull)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HoodFull)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoofLead)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Headlamps)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Trunk)
             </th>
             <th></th>
         </tr>
@@ -53,13 +99,59 @@
                 @Html.DisplayFor(modelItem => item.WarrantyEndDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Product.ProductId)
+                @Html.DisplayFor(modelItem => item.VehicleYear)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Customer.Email)
+                @Html.DisplayFor(modelItem => item.VehicleMake)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleModel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleVIN)
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.CustomerName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Dealer.DealerName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BumpersFront)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoodLead)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mirrors)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BumpersBack)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EdgeGuard)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Windshield)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FendersLead)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoofFull)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoodFull)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoofLead)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Headlamps)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Trunk)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.WarrantyId">Edit</a> |

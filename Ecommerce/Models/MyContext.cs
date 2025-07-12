@@ -13,15 +13,10 @@ namespace Ecommerce.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Product>()
-                .Property(p => p.Price)
-                .HasPrecision(18, 2);
+            //modelBuilder.Entity<Product>()
+            //    .Property(p => p.Price)
+            //    .HasPrecision(18, 2);
 
-            modelBuilder.Entity<Warranty>()
-                .HasOne(w => w.Product)
-                .WithMany(p => p.Warranties)
-                .HasForeignKey(w => w.ProductId)
-                .IsRequired();
 
             modelBuilder.Entity<Warranty>()
                 .HasOne(w => w.Customer)
@@ -32,10 +27,10 @@ namespace Ecommerce.Models
                 .HasOne(w => w.Dealer)
                 .WithMany(d => d.Warranties)
                 .HasForeignKey(w => w.DealerId);
+          
         }
 
 
-        public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> Users { get; set; }

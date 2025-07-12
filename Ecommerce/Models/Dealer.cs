@@ -10,12 +10,12 @@ namespace Ecommerce.Models
         [Required]
         public string DealerName { get; set; }
 
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [Required]
         public string Email { get; set; }
 
-        public ICollection<Warranty> Warranties { get; set; } = new List<Warranty>();
+        public ICollection<Warranty>? Warranties { get; set; } = new List<Warranty>();
     }
 
 

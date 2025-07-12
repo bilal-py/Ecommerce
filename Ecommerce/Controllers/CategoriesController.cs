@@ -9,88 +9,88 @@ using Ecommerce.Models;
 
 namespace Ecommerce.Controllers
 {
-    public class CustomersController : Controller
+    public class CategoriesController : Controller
     {
         private readonly MyContext _context;
 
-        public CustomersController(MyContext context)
+        public CategoriesController(MyContext context)
         {
             _context = context;
         }
 
-        // GET: Customers
+        // GET: Categories
         public async Task<IActionResult> Index()
         {
-              return _context.Customers != null ? 
-                          View(await _context.Customers.ToListAsync()) :
-                          Problem("Entity set 'MyContext.Customers'  is null.");
+              return _context.Categories != null ? 
+                          View(await _context.Categories.ToListAsync()) :
+                          Problem("Entity set 'MyContext.Categories'  is null.");
         }
 
-        // GET: Customers/Details/5
+        // GET: Categories/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
-            if (customer == null)
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(category);
         }
 
-        // GET: Customers/Create
+        // GET: Categories/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Customers/Create
+        // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerId,CustomerName,Email,Address,PhoneNumber")] Customer customer)
+        public async Task<IActionResult> Create([Bind("CategoryId,Name,Description,IconText")] Category category)
         {
             if (ModelState.IsValid)
             {
-                customer.CustomerId = Guid.NewGuid();
-                _context.Add(customer);
+                category.CategoryId = Guid.NewGuid();
+                _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+            return View(category);
         }
 
-        // GET: Customers/Edit/5
+        // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
-            return View(customer);
+            return View(category);
         }
 
-        // POST: Customers/Edit/5
+        // POST: Categories/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("CustomerId,CustomerName,Email,Address,PhoneNumber")] Customer customer)
+        public async Task<IActionResult> Edit(Guid id, [Bind("CategoryId,Name,Description,IconText")] Category category)
         {
-            if (id != customer.CustomerId)
+            if (id != category.CategoryId)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace Ecommerce.Controllers
             {
                 try
                 {
-                    _context.Update(customer);
+                    _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.CustomerId))
+                    if (!CategoryExists(category.CategoryId))
                     {
                         return NotFound();
                     }
@@ -115,49 +115,49 @@ namespace Ecommerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+            return View(category);
         }
 
-        // GET: Customers/Delete/5
+        // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Customers == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
-            if (customer == null)
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(category);
         }
 
-        // POST: Customers/Delete/5
+        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Customers == null)
+            if (_context.Categories == null)
             {
-                return Problem("Entity set 'MyContext.Customers'  is null.");
+                return Problem("Entity set 'MyContext.Categories'  is null.");
             }
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer != null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
             {
-                _context.Customers.Remove(customer);
+                _context.Categories.Remove(category);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CustomerExists(Guid id)
+        private bool CategoryExists(Guid id)
         {
-          return (_context.Customers?.Any(e => e.CustomerId == id)).GetValueOrDefault();
+          return (_context.Categories?.Any(e => e.CategoryId == id)).GetValueOrDefault();
         }
     }
 }

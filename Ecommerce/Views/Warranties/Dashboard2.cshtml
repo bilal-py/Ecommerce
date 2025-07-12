@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userName = User.Identity.Name ?? "User";
+}
+
+@section Styles {
+    <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+    <style>
+        /* Custom styles retained from your snippet */
+        body {
+            font-family: "Roboto", sans-serif;
+        }
+
+        header {
+            position: fixed;
+            width: 100%;
+            background: #22242A;
+            padding: 20px;
+            height: 60px;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .left_area h3 {
+            color: #fff;
+            margin: 0;
+            font-weight: 900;
+        }
+
+        .left_area span {
+            color: #19B3D3;
+        }
+
+        .logout_btn {
+            float: right;
+            background: #19B3D3;
+            padding: 5px 10px;
+            color: white;
+            font-weight: bold;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            background: #2f323a;
+            width: 250px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            padding-top: 30px;
+        }
+
+            .sidebar a {
+                color: #fff;
+                display: block;
+                padding: 15px 30px;
+                text-decoration: none;
+            }
+
+                .sidebar a:hover {
+                    background-color: #19B3D3;
+                }
+
+        .content {
+            margin-left: 250px;
+            margin-top: 80px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+    </style>
+}
+
+<header>
+    <div class="left_area">
+        <h3>Dashboard <span>Panel</span></h3>
+    </div>
+    <div class="right_area">
+        <a asp-controller="Account" asp-action="Logout" class="logout_btn">Logout</a>
+    </div>
+</header>
+
+<div class="sidebar">
+    <div class="text-center text-white mb-3">
+        <strong>Welcome, @userName</strong>
+    </div>
+    <a href="#" onclick="loadSubview('/Dashboard/WarrantyRegistration')"><i class="fas fa-plus"></i> Warranty Registrationsssssss</a>
+    <a href="#" onclick="loadSubview('/Dashboard/WarrantyPending')"><i class="fas fa-hourglass-half"></i> Warranty Pending</a>
+    <a href="#" onclick="loadSubview('/Dashboard/WarrantyApproved')"><i class="fas fa-check-circle"></i> Warranty Approved</a>
+    <a href="#" onclick="loadSubview('/Dashboard/ExpiredWarranty')"><i class="fas fa-exclamation-triangle"></i> Expired Warranty</a>
+    <a href="#" onclick="loadSubview('/Dashboard/Settings')"><i class="fas fa-cogs"></i> Settings</a>
+</div>
+
+<div class="content" id="subview-container">
+    <div class="text-muted">Select a dashboard option from the sidebar to get started.</div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function loadSubview(url) {
+            $("#subview-container").fadeOut("fast", function () {
+                $("#subview-container").load(url, function () {
+                    $("#subview-container").fadeIn("fast");
+                });
+            });
+        }
+    </script>
+}

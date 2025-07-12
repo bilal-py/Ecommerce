@@ -1,0 +1,224 @@
+﻿@model Ecommerce.Models.Warranty
+
+@{
+    ViewData["Title"] = "WarrantyRegistration";
+    Layout = null; // For AJAX or partial use
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-12 col-lg-8">
+        <div class="container bg-white shadow p-4 rounded">
+            <h3 class="text-center mb-4 fw-bold">Warranty Card</h3>
+
+            <form asp-action="SaveWarrantyFromDashboard" asp-controller="Warranties" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Roll Number -->
+                <div class="mb-3">
+                    <label asp-for="RollNumber" class="form-label"></label>
+                    <input asp-for="RollNumber" class="form-control form-control-sm" />
+                    <span asp-validation-for="RollNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Customer & Dealer -->
+                <h5 class="mt-4">Customer Details</h5>
+                <!-- Customer Name -->
+                <div class="mb-3">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" id="CustomerName" name="Customer.CustomerName" class="form-control form-control-sm" required />
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="CustomerEmail" name="Customer.Email" class="form-control form-control-sm" required />
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" id="PhoneNumber" name="Customer.PhoneNumber" class="form-control form-control-sm" />
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" id="Address" name="Customer.Address" class="form-control form-control-sm" />
+                </div>
+
+                <!-- City -->
+                <div class="mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" id="City" name="Customer.City" class="form-control form-control-sm" />
+                </div>
+
+                <!-- State -->
+                <div class="mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" id="State" name="Customer.State" class="form-control form-control-sm" />
+                </div>
+
+                <!-- Zip -->
+                <div class="mb-3">
+                    <label class="form-label">Zip</label>
+                    <input type="text" id="Zip" name="Customer.Zip" class="form-control form-control-sm" />
+                </div>
+
+                <!-- Hidden CustomerId -->
+                <input type="hidden" id="CustomerId" name="Customer.Id" />
+
+
+                <!-- Vehicle Information -->
+                <h5 class="mt-5">Vehicle Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label asp-for="VehicleYear" class="form-label"></label>
+                        <input asp-for="VehicleYear" class="form-control form-control-sm" />
+                        <span asp-validation-for="VehicleYear" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="VehicleMake" class="form-label"></label>
+                        <input asp-for="VehicleMake" class="form-control form-control-sm" />
+                        <span asp-validation-for="VehicleMake" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="VehicleModel" class="form-label"></label>
+                        <input asp-for="VehicleModel" class="form-control form-control-sm" />
+                        <span asp-validation-for="VehicleModel" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="VehicleVIN" class="form-label"></label>
+                        <input asp-for="VehicleVIN" class="form-control form-control-sm" />
+                        <span asp-validation-for="VehicleVIN" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Warranty Dates -->
+                <h5 class="mt-5">Warranty Period</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="WarrantyStartDate" class="form-label"></label>
+                        <input asp-for="WarrantyStartDate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="WarrantyStartDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="WarrantyEndDate" class="form-label"></label>
+                        <input asp-for="WarrantyEndDate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="WarrantyEndDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+               
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-control form-control-sm">
+                        <option value="">Select</option>
+                        <option value="0">Pending</option>
+                        <option value="1">Approved</option>
+                        <option value="-1">Rejected</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+
+                <!-- Packages -->
+                <h5 class="mt-5">Packages</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input asp-for="BumpersFront" class="form-check-input" />
+                            <label asp-for="BumpersFront" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="HoodLead" class="form-check-input" />
+                            <label asp-for="HoodLead" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="Mirrors" class="form-check-input" />
+                            <label asp-for="Mirrors" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="BumpersBack" class="form-check-input" />
+                            <label asp-for="BumpersBack" class="form-check-label"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input asp-for="EdgeGuard" class="form-check-input" />
+                            <label asp-for="EdgeGuard" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="Windshield" class="form-check-input" />
+                            <label asp-for="Windshield" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="FendersLead" class="form-check-input" />
+                            <label asp-for="FendersLead" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="RoofFull" class="form-check-input" />
+                            <label asp-for="RoofFull" class="form-check-label"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input asp-for="HoodFull" class="form-check-input" />
+                            <label asp-for="HoodFull" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="RoofLead" class="form-check-input" />
+                            <label asp-for="RoofLead" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="Headlamps" class="form-check-input" />
+                            <label asp-for="Headlamps" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="Trunk" class="form-check-input" />
+                            <label asp-for="Trunk" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Submit -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary px-4">Submit Warranty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#CustomerEmail").on("blur", function () {
+            var email = $(this).val();
+
+            if (email) {
+                $.ajax({
+                    url: '/Warranties/GetCustomerByEmail',
+                    type: 'GET',
+                    data: { email: email },
+                    success: function (data) {
+                        if (data) {
+                            // Auto-fill form
+                            $("#CustomerId").val(data.customerId);
+                            $("#CustomerName").val(data.customerName);
+                            $("#PhoneNumber").val(data.phoneNumber);
+                            $("#Address").val(data.address);
+                            $("#City").val(data.city);
+                            $("#State").val(data.state);
+                            $("#Zip").val(data.zip);
+                        } else {
+                            // New customer
+                            $("#CustomerId").val('');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}
