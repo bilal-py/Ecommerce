@@ -372,6 +372,24 @@ namespace Ecommerce.Controllers
             return RedirectToAction("Dashboard");
         }
 
+        [HttpGet]
+        public IActionResult CheckRollNumberForDealer(string rollNumber)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+
+
+            if (user?.DealerId == null)
+            {
+                return Json(new { exists = false }); // or return error
+            }
+
+            bool exists = _context.Warranties.Any(w =>
+                w.RollNumber == rollNumber && w.DealerId == user.DealerId);
+
+            return Json(new { exists });
+        }
+
 
     }
 }

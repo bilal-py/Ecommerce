@@ -16,8 +16,9 @@
                 <!-- Roll Number -->
                 <div class="mb-3">
                     <label asp-for="RollNumber" class="form-label"></label>
-                    <input asp-for="RollNumber" class="form-control form-control-sm" />
+                    <input asp-for="RollNumber" class="form-control form-control-sm" id="RollNumber" />
                     <span asp-validation-for="RollNumber" class="text-danger"></span>
+                    <span class="text-danger" id="rollNumberError" style="display:none;"></span>
                 </div>
 
                 <!-- Customer & Dealer -->
@@ -192,33 +193,49 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $("#CustomerEmail").on("blur", function () {
-            var email = $(this).val();
 
-            if (email) {
-                $.ajax({
-                    url: '/Warranties/GetCustomerByEmail',
-                    type: 'GET',
-                    data: { email: email },
-                    success: function (data) {
-                        if (data) {
-                            // Auto-fill form
-                            $("#CustomerId").val(data.customerId);
-                            $("#CustomerName").val(data.customerName);
-                            $("#PhoneNumber").val(data.phoneNumber);
-                            $("#Address").val(data.address);
-                            $("#City").val(data.city);
-                            $("#State").val(data.state);
-                            $("#Zip").val(data.zip);
-                        } else {
-                            // New customer
-                            $("#CustomerId").val('');
-                        }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("jQuery loaded");
+
+        const $rollInput = $('#RollNumber');
+        const $errorSpan = $('#rollNumberError');
+
+        $rollInput.on('blur', function () {
+            console.log("Blur event triggered");
+
+            const rollNumber = $rollInput.val().trim();
+            $errorSpan.hide().text('');
+
+            if (!rollNumber) return;
+
+            $.get('/Warranties/CheckRollNumberForDealer', { rollNumber: rollNumber })
+                .done(function (data) {
+                    console.log("AJAX success", data);
+
+                    if (data.exists) {
+                        $errorSpan.text('This Roll Number already exists.').show();
+                        $rollInput.addClass('is-invalid');
+                    } else {
+                        $errorSpan.text('').hide();
+                        $rollInput.removeClass('is-invalid');
                     }
+                })
+                .fail(function () {
+                    console.log("AJAX failed");
+                    $errorSpan.text('Error validating roll number.').show();
                 });
+        });
+
+        $('form').on('submit', function (e) {
+            if ($rollInput.hasClass('is-invalid')) {
+                e.preventDefault();
+                $rollInput.focus();
             }
         });
-    </script>
-}
+    });
+</script>
+
+
+

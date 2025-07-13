@@ -49,7 +49,29 @@
     <title>Home</title>
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function loadSubview(url) {
+            $("#subview-container").load(url, function () {
+                $("#subview-container").fadeIn("fast");
+                $("#subview-container1, #subview-container2").fadeOut("fast");
+            });
+        }
 
+        function loadSubview1(url) {
+            $("#subview-container1").load(url, function () {
+                $("#subview-container1").fadeIn("fast");
+                $("#subview-container, #subview-container2").fadeOut("fast");
+            });
+        }
+
+        function loadSubview2(url) {
+            $("#subview-container2").load(url, function () {
+                $("#subview-container2").fadeIn("fast");
+                $("#subview-container, #subview-container1").fadeOut("fast");
+            });
+        }
+    </script>
 </head>
 <body style="padding-top: 80px;">
 
@@ -98,26 +120,5 @@
   </div>
 </body>
 </html>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function loadSubview(url) {
-        $("#subview-container").load(url, function () {
-                $("#subview-container").fadeIn("fast");
-            $("#subview-container1, #subview-container2").fadeOut("fast");
-        });
-    }
 
-    function loadSubview1(url) {
-        $("#subview-container1").load(url, function () {
-            $("#subview-container1").fadeIn("fast");
-            $("#subview-container, #subview-container2").fadeOut("fast");
-        });
-    }
 
-    function loadSubview2(url) {
-        $("#subview-container2").load(url, function () {
-            $("#subview-container2").fadeIn("fast");
-            $("#subview-container, #subview-container1").fadeOut("fast");
-        });
-    }
-</script>
