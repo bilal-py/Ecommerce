@@ -6,7 +6,7 @@ namespace Ecommerce.Models
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=motoprotekt;Trusted_Connection=True;");
+            optionsBuilder.UseNpgsql("Host=crossover.proxy.rlwy.net;Port=26805;Database=railway;Username=postgres;Password=PGPASSWORD=qdomFgfvOxiNJwMOqjOhbXslnXSyFFRX");
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
