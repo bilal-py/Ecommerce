@@ -9,6 +9,24 @@
     <div class="col-md-12 col-lg-8">
         <div class="container bg-white shadow p-4 rounded">
             <h3 class="text-center mb-4 fw-bold">Warranty Card</h3>
+            @* Success Alert *@
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @* Error Alert (optional) *@
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
 
             <form asp-action="SaveWarrantyFromDashboard" asp-controller="Warranties" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -16,8 +34,9 @@
                 <!-- Roll Number -->
                 <div class="mb-3">
                     <label asp-for="RollNumber" class="form-label"></label>
-                    <input asp-for="RollNumber" class="form-control form-control-sm" />
+                    <input asp-for="RollNumber" class="form-control form-control-sm" id="RollNumber" />
                     <span asp-validation-for="RollNumber" class="text-danger"></span>
+                    <span class="text-danger" id="rollNumberError" style="display:none;"></span>
                 </div>
 
                 <!-- Customer & Dealer -->
@@ -108,25 +127,25 @@
                     </div>
                 </div>
 
-               
-
-                <!-- Status -->
-                <div class="mb-3">
-                    <label asp-for="Status" class="form-label">Status</label>
-                    <select asp-for="Status" class="form-control form-control-sm">
-                        <option value="">Select</option>
-                        <option value="0">Pending</option>
-                        <option value="1">Approved</option>
-                        <option value="-1">Rejected</option>
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div>
-
 
                 <!-- Packages -->
                 <h5 class="mt-5">Packages</h5>
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input asp-for="VehicleWrapFull" class="form-check-input" />
+                            <label asp-for="VehicleWrapFull" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="FrontFull" class="form-check-input" />
+                            <label asp-for="FrontFull" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="FrontLeadingEdge" class="form-check-input" />
+                            <label asp-for="FrontLeadingEdge" class="form-check-label"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="form-check">
                             <input asp-for="BumpersFront" class="form-check-input" />
                             <label asp-for="BumpersFront" class="form-check-label"></label>
@@ -144,7 +163,7 @@
                             <label asp-for="BumpersBack" class="form-check-label"></label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-check">
                             <input asp-for="EdgeGuard" class="form-check-input" />
                             <label asp-for="EdgeGuard" class="form-check-label"></label>
@@ -162,7 +181,7 @@
                             <label asp-for="RoofFull" class="form-check-label"></label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-check">
                             <input asp-for="HoodFull" class="form-check-input" />
                             <label asp-for="HoodFull" class="form-check-label"></label>
@@ -192,33 +211,49 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $("#CustomerEmail").on("blur", function () {
-            var email = $(this).val();
 
-            if (email) {
-                $.ajax({
-                    url: '/Warranties/GetCustomerByEmail',
-                    type: 'GET',
-                    data: { email: email },
-                    success: function (data) {
-                        if (data) {
-                            // Auto-fill form
-                            $("#CustomerId").val(data.customerId);
-                            $("#CustomerName").val(data.customerName);
-                            $("#PhoneNumber").val(data.phoneNumber);
-                            $("#Address").val(data.address);
-                            $("#City").val(data.city);
-                            $("#State").val(data.state);
-                            $("#Zip").val(data.zip);
-                        } else {
-                            // New customer
-                            $("#CustomerId").val('');
-                        }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("jQuery loaded");
+
+        const $rollInput = $('#RollNumber');
+        const $errorSpan = $('#rollNumberError');
+
+        $rollInput.on('blur', function () {
+            console.log("Blur event triggered");
+
+            const rollNumber = $rollInput.val().trim();
+            $errorSpan.hide().text('');
+
+            if (!rollNumber) return;
+
+            $.get('/Warranties/CheckRollNumberForDealer', { rollNumber: rollNumber })
+                .done(function (data) {
+                    console.log("AJAX success", data);
+
+                    if (data.exists) {
+                        $errorSpan.text('This Roll Number already exists.').show();
+                        $rollInput.addClass('is-invalid');
+                    } else {
+                        $errorSpan.text('').hide();
+                        $rollInput.removeClass('is-invalid');
                     }
+                })
+                .fail(function () {
+                    console.log("AJAX failed");
+                    $errorSpan.text('Error validating roll number.').show();
                 });
+        });
+
+        $('form').on('submit', function (e) {
+            if ($rollInput.hasClass('is-invalid')) {
+                e.preventDefault();
+                $rollInput.focus();
             }
         });
-    </script>
-}
+    });
+</script>
+
+
+

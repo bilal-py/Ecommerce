@@ -26,6 +26,9 @@ namespace Ecommerce.Models
         public Guid DealerId { get; set; }
         public Dealer Dealer { get; set; }
 
+        public bool VehicleWrapFull { get; set; }
+        public bool FrontFull{ get; set; }
+        public bool FrontLeadingEdge { get; set; }
         public bool BumpersFront { get; set; }
         public bool HoodLead { get; set; }
         public bool Mirrors { get; set; }
