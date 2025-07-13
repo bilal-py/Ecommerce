@@ -3,41 +3,134 @@
     ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container-fluid">
-    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
-        <div class="col-md-6">
-            <div class="p-4" style="background-color: #6d36e4; border-radius: 8px; color: white; text-align: center;">
-                <h1 class="my-h1">Login</h1>
-            </div>
-            <div class="p-4 mt-3" style="background-color: #fff; border-radius: 8px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);">
-                <form asp-action="Login" method="post">
-                    @Html.HiddenFor(x => x.ReturnUrl)
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+<!-- Page‑specific styles -->
+<style>
+    /* full‑page gradient like the screenshot */
+    body.login-gradient-bg {
+        background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);
+    }
+
+
+    .auth-card {
+        backdrop-filter: blur(40px);
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+        .auth-card .left-pane {
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+        }
+
+        .auth-card .right-pane {
+            background: #000;
+            color: #fff;
+            position: relative;
+        }
+
+        .auth-card .form-control-dark {
+            background: #000;
+            border: none;
+            border-radius: 9999px;
+            color: #fff;
+            padding: 0.9rem 1.5rem;
+        }
+
+            .auth-card .form-control-dark::placeholder {
+                color: #aaa;
+            }
+
+    .gradient-btn {
+        background: linear-gradient(90deg, #ff8ca5, #ffa897);
+        border: none;
+        color: #000;
+        font-weight: 600;
+        border-radius: 9999px;
+        width: 100%;
+        padding: 0.7rem 1rem;
+    }
+
+    /* “get your right job” floating card on testimonial side */
+    .floating-card {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(12px);
+        padding: 1rem;
+        border-radius: 20px;
+        max-width: 260px;
+        font-size: 0.85rem;
+    }
+</style>
+
+<body class="login-gradient-bg" style="padding-top: 80px;">
+    <div class="d-flex justify-content-center align-items-center py-5">
+        <div class="auth-card shadow-lg w-100" style="max-width: 1050px;">
+
+            <!-- LEFT: Login pane -->
+            <div class="left-pane p-5 col-12 col-md-6">
+                <h2 class="fw-bold display-6 mb-1">Welcome back</h2>
+                <p class="text-muted mb-4" style="color:#c9c9c9!important;">Please enter your account details</p>
+
+                <form asp-action="Login" method="post">
+                    @Html.HiddenFor(m => m.ReturnUrl)
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
                     @if (ViewBag.Message != null)
                     {
-                        <span style="color: red;">@ViewBag.Message</span>
-
+                        <span class="text-danger">@ViewBag.Message</span>
                     }
 
-                    <div class="mb-3">
-                        <label for="userName" class="form-label">Username:</label>
-                        <input class="form-control" type="text" name="userName" placeholder="userName" />
+                    <!-- Email -->
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Email</label>
+                        @Html.TextBoxFor(m => m.userName,
+                        new
+                        {
+                            @class = "form-control form-control-dark",
+                            @placeholder = "Enter mail id",
+                            @autocomplete = "username"
+                        })
                         <span asp-validation-for="userName" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="Password" class="form-label">Password:</label>
-                        <input class="form-control" type="password" name="password" placeholder="password" />
+                    <!-- Password -->
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Password</label>
+                        @Html.PasswordFor(m => m.Password,
+                                                new
+                                                {
+                                                    @class = "form-control form-control-dark",
+                                                    @placeholder = "• • • • • •",
+                                                    @autocomplete = "current-password"
+                                                })
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
-                    <div style="text-align: center;">
-                        <button type="submit" class="btn btn-primary" style="background-color: #6d36e4;">Login</button>
+                    <!-- Keep me logged in & Forgot -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" />
+                            <label class="form-check-label small" for="rememberMe">Keep me logged in</label>
+                        </div>
+                        <a href="#" class="small link-light text-decoration-underline">Forgot password</a>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="gradient-btn mb-4">Sign in</button>
+
+                    <!-- Social icons -->
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="32" height="32" /></a>
+                        <a href="#"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="32" height="32" /></a>
+                        <a href="#"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" width="32" height="32" /></a>
                     </div>
                 </form>
             </div>
+
+            <!-- RIGHT: Testimonial pane -->
+
         </div>
     </div>
-</div>
-
+</body>
