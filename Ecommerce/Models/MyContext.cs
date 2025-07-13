@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Ecommerce.Models
 {
     public class MyContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public MyContext(DbContextOptions<MyContext> options)
+            : base(options)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=motoprotekt;Trusted_Connection=True;");
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -32,7 +33,6 @@ namespace Ecommerce.Models
                 .WithMany(d => d.Warranties)
                 .HasForeignKey(w => w.DealerId);
         }
-
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
