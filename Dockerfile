@@ -10,8 +10,8 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Ecommerce/Ecommerce.csproj", "Ecommerce/"]
+
+COPY Ecommerce.csproj ./
 RUN dotnet restore "./Ecommerce.csproj"
 COPY . .
 WORKDIR "/src/Ecommerce"
