@@ -24,5 +24,8 @@ namespace Ecommerce.Models
         public int? Age { get; set; }
 
         public string Role { get; set; }
+        public Guid? DealerId { get; set; } // Only assigned if user is a Dealer
+        public Dealer? Dealer { get; set; }
+
     }
 }

@@ -73,12 +73,12 @@
                     <li><a class="nav-link scrollto active" asp-controller="Home" asp-action="Index">Home</a></li>
 
                     <li><a class="nav-link scrollto" href="#services">Categories</a></li>
-                    <li><a class="nav-link scrollto" href="#portfolio">Products</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="Dashboard">Dashboard</a>
+                            <a class="nav-link" asp-controller="Warranties" asp-action="Dashboard">Dashboard</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Account" asp-action="UserProfile">Show Profile</a>
                         </li>
@@ -93,7 +93,7 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="Dashboard">Dashboard</a>
+                            <a class="nav-link" asp-controller="Warranties" asp-action="Dashboard">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Dealer Login</a>

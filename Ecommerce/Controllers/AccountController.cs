@@ -72,51 +72,62 @@ namespace Ecommerce.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAccount(RegisterModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var exists = _dbContext.Users.Any(u => u.userName == model.UserName || u.email == model.Email);
+            if (exists)
             {
-                // Check if this user already exists in the database
-                var existingUser = _dbContext.Users.FirstOrDefault(u => u.userName == model.UserName || u.email == model.Email);
-
-                if (existingUser != null)
-                {
-                    ModelState.AddModelError(string.Empty, "Username or email already exists.");
-                    return View(model);
-                }
-
-                var newUser = new User
-                {
-                    userName = model.UserName,
-                    email = model.Email,
-                    password = model.Password,
-                    Age = model.Age,
-                    Role = "User"
-                };
-
-                _dbContext.Users.Add(newUser);
-                _dbContext.SaveChanges();
-
-                // Automatically log in the newly registered user
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, Convert.ToString(newUser.Id)),
-                    new Claim(ClaimTypes.Name, newUser.userName),
-                    new Claim(ClaimTypes.Role, newUser.Role),
-                    new Claim("Home", "Code")
-                };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                    new AuthenticationProperties
-                    {
-                        IsPersistent = false
-                    });
-
-                return RedirectToAction("Index", "Home");
+                ModelState.AddModelError(string.Empty, "Username or email already exists.");
+                return View(model);
             }
 
-            return View(model);
+            // Create dealer ID only for Dealer
+            Guid? dealerId = null;
+           
+            dealerId = Guid.NewGuid();
+
+            var dealer = new Dealer
+            {
+                DealerId = dealerId.Value,
+                DealerName = model.UserName,
+                Email = model.Email
+            };
+
+            _dbContext.Dealers.Add(dealer);
+           
+           var newUser = new User
+            {
+                userName = model.UserName,
+                email = model.Email,
+                password = model.Password,
+                Age = model.Age,
+                Role = "Dealer", // "Dealer" from UI or hardcoded
+                DealerId = dealerId
+            };
+
+            _dbContext.Users.Add(newUser);
+            await _dbContext.SaveChangesAsync();
+
+            // Auto-login Dealer after registration (optional)
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
+            new Claim(ClaimTypes.Name, newUser.userName),
+            new Claim(ClaimTypes.Role, newUser.Role),
+            new Claim("DealerId", dealer.DealerId.ToString())
+        };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                new AuthenticationProperties { IsPersistent = false });
+
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         [Authorize]
         public IActionResult UserProfile()

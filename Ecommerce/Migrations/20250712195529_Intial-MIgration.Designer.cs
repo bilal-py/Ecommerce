@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20250712060134_Intiial")]
-    partial class Intiial
+    [Migration("20250712195529_Intial-MIgration")]
+    partial class IntialMIgration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,9 +31,6 @@ namespace Ecommerce.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int?>("Quantity")
                         .IsRequired()
                         .HasColumnType("int");
@@ -42,8 +39,6 @@ namespace Ecommerce.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CartId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -80,6 +75,10 @@ namespace Ecommerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -89,6 +88,14 @@ namespace Ecommerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Zip")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -112,44 +119,11 @@ namespace Ecommerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("DealerId");
 
                     b.ToTable("Dealers");
-                });
-
-            modelBuilder.Entity("Ecommerce.Models.Product", b =>
-                {
-                    b.Property<Guid>("ProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("QuantityAvailable")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.User", b =>
@@ -163,6 +137,9 @@ namespace Ecommerce.Migrations
                     b.Property<int?>("Age")
                         .IsRequired()
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("DealerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -182,6 +159,8 @@ namespace Ecommerce.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DealerId");
+
                     b.ToTable("Users");
                 });
 
@@ -191,21 +170,67 @@ namespace Ecommerce.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("BumpersBack")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("BumpersFront")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("DealerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<bool>("EdgeGuard")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("FendersLead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Headlamps")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HoodFull")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HoodLead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Mirrors")
+                        .HasColumnType("bit");
 
                     b.Property<string>("RollNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("RoofFull")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RoofLead")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Trunk")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VehicleMake")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleModel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleVIN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleYear")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("WarrantyEndDate")
                         .HasColumnType("datetime2");
@@ -213,41 +238,34 @@ namespace Ecommerce.Migrations
                     b.Property<DateTime>("WarrantyStartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Windshield")
+                        .HasColumnType("bit");
+
                     b.HasKey("WarrantyId");
 
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("DealerId");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("Warranties");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Cart", b =>
                 {
-                    b.HasOne("Ecommerce.Models.Product", "Product")
-                        .WithMany("Carts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Ecommerce.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Product");
-
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Ecommerce.Models.Product", b =>
+            modelBuilder.Entity("Ecommerce.Models.User", b =>
                 {
-                    b.HasOne("Ecommerce.Models.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId");
+                    b.HasOne("Ecommerce.Models.Dealer", "Dealer")
+                        .WithMany()
+                        .HasForeignKey("DealerId");
 
-                    b.Navigation("Category");
+                    b.Navigation("Dealer");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Warranty", b =>
@@ -264,22 +282,9 @@ namespace Ecommerce.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerce.Models.Product", "Product")
-                        .WithMany("Warranties")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
 
                     b.Navigation("Dealer");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Ecommerce.Models.Category", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Customer", b =>
@@ -289,13 +294,6 @@ namespace Ecommerce.Migrations
 
             modelBuilder.Entity("Ecommerce.Models.Dealer", b =>
                 {
-                    b.Navigation("Warranties");
-                });
-
-            modelBuilder.Entity("Ecommerce.Models.Product", b =>
-                {
-                    b.Navigation("Carts");
-
                     b.Navigation("Warranties");
                 });
 #pragma warning restore 612, 618

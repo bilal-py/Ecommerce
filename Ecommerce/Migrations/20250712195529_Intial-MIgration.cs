@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ecommerce.Migrations
 {
     /// <inheritdoc />
-    public partial class Intiial : Migration
+    public partial class IntialMIgration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,9 +31,12 @@ namespace Ecommerce.Migrations
                 {
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zip = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,7 +49,7 @@ namespace Ecommerce.Migrations
                 {
                     DealerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DealerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -64,58 +67,17 @@ namespace Ecommerce.Migrations
                     password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Age = table.Column<int>(type: "int", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DealerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    QuantityAvailable = table.Column<int>(type: "int", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_Products_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "CategoryId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Carts",
-                columns: table => new
-                {
-                    CartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Carts", x => x.CartId);
-                    table.ForeignKey(
-                        name: "FK_Carts_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Carts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
+                        name: "FK_Users_Dealers_DealerId",
+                        column: x => x.DealerId,
+                        principalTable: "Dealers",
+                        principalColumn: "DealerId");
                 });
 
             migrationBuilder.CreateTable(
@@ -127,9 +89,24 @@ namespace Ecommerce.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     WarrantyStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     WarrantyEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VehicleYear = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VehicleMake = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VehicleModel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VehicleVIN = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DealerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    DealerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BumpersFront = table.Column<bool>(type: "bit", nullable: false),
+                    HoodLead = table.Column<bool>(type: "bit", nullable: false),
+                    Mirrors = table.Column<bool>(type: "bit", nullable: false),
+                    BumpersBack = table.Column<bool>(type: "bit", nullable: false),
+                    EdgeGuard = table.Column<bool>(type: "bit", nullable: false),
+                    Windshield = table.Column<bool>(type: "bit", nullable: false),
+                    FendersLead = table.Column<bool>(type: "bit", nullable: false),
+                    RoofFull = table.Column<bool>(type: "bit", nullable: false),
+                    HoodFull = table.Column<bool>(type: "bit", nullable: false),
+                    RoofLead = table.Column<bool>(type: "bit", nullable: false),
+                    Headlamps = table.Column<bool>(type: "bit", nullable: false),
+                    Trunk = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -146,18 +123,25 @@ namespace Ecommerce.Migrations
                         principalTable: "Dealers",
                         principalColumn: "DealerId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Warranties_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Carts_ProductId",
-                table: "Carts",
-                column: "ProductId");
+            migrationBuilder.CreateTable(
+                name: "Carts",
+                columns: table => new
+                {
+                    CartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carts", x => x.CartId);
+                    table.ForeignKey(
+                        name: "FK_Carts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Carts_UserId",
@@ -165,9 +149,9 @@ namespace Ecommerce.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_CategoryId",
-                table: "Products",
-                column: "CategoryId");
+                name: "IX_Users_DealerId",
+                table: "Users",
+                column: "DealerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Warranties_CustomerId",
@@ -178,11 +162,6 @@ namespace Ecommerce.Migrations
                 name: "IX_Warranties_DealerId",
                 table: "Warranties",
                 column: "DealerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Warranties_ProductId",
-                table: "Warranties",
-                column: "ProductId");
         }
 
         /// <inheritdoc />
@@ -190,6 +169,9 @@ namespace Ecommerce.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Warranties");
@@ -202,12 +184,6 @@ namespace Ecommerce.Migrations
 
             migrationBuilder.DropTable(
                 name: "Dealers");
-
-            migrationBuilder.DropTable(
-                name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
         }
     }
 }

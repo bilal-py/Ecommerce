@@ -35,10 +35,26 @@
                 <span asp-validation-for="WarrantyEndDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ProductId" class="control-label"></label>
-                <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
-                <span asp-validation-for="ProductId" class="text-danger"></span>
+                <label asp-for="VehicleYear" class="control-label"></label>
+                <input asp-for="VehicleYear" class="form-control" />
+                <span asp-validation-for="VehicleYear" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="VehicleMake" class="control-label"></label>
+                <input asp-for="VehicleMake" class="form-control" />
+                <span asp-validation-for="VehicleMake" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleModel" class="control-label"></label>
+                <input asp-for="VehicleModel" class="form-control" />
+                <span asp-validation-for="VehicleModel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleVIN" class="control-label"></label>
+                <input asp-for="VehicleVIN" class="form-control" />
+                <span asp-validation-for="VehicleVIN" class="text-danger"></span>
+            </div>
+           
             <div class="form-group">
                 <label asp-for="CustomerId" class="control-label"></label>
                 <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
@@ -48,6 +64,66 @@
                 <label asp-for="DealerId" class="control-label"></label>
                 <select asp-for="DealerId" class="form-control" asp-items="ViewBag.DealerId"></select>
                 <span asp-validation-for="DealerId" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="BumpersFront" /> @Html.DisplayNameFor(model => model.BumpersFront)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="HoodLead" /> @Html.DisplayNameFor(model => model.HoodLead)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Mirrors" /> @Html.DisplayNameFor(model => model.Mirrors)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="BumpersBack" /> @Html.DisplayNameFor(model => model.BumpersBack)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="EdgeGuard" /> @Html.DisplayNameFor(model => model.EdgeGuard)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Windshield" /> @Html.DisplayNameFor(model => model.Windshield)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="FendersLead" /> @Html.DisplayNameFor(model => model.FendersLead)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="RoofFull" /> @Html.DisplayNameFor(model => model.RoofFull)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="HoodFull" /> @Html.DisplayNameFor(model => model.HoodFull)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="RoofLead" /> @Html.DisplayNameFor(model => model.RoofLead)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Headlamps" /> @Html.DisplayNameFor(model => model.Headlamps)
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Trunk" /> @Html.DisplayNameFor(model => model.Trunk)
+                </label>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

@@ -1,0 +1,110 @@
+﻿
+@model List<Ecommerce.Models.Warranty>
+@{
+    ViewData["Title"] = "WarrantyPendingPage";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
+    <div class="col-md-10">
+        <h3 class="mb-4 text-center">Warranty Pending</h3>
+
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Dealer</th>
+                    <th>Status</th>
+                    @if (isAdmin)
+                    {
+                        <th>Actions</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@item.Customer?.CustomerName</td>
+                        <td>@item.Customer?.Email</td>
+                        <td>@item.Customer?.PhoneNumber</td>
+                        <td>@item.Dealer?.DealerName</td>
+                        <td>Pending</td>
+
+                        @if (isAdmin)
+                        {
+                            <td>
+                                <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="warrantyId" value="@item.WarrantyId" />
+                                    <input type="hidden" name="status" value="1" />
+                                    <button class="btn btn-success btn-sm px-3">Accept</button>
+                                </form>
+                                <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="warrantyId" value="@item.WarrantyId" />
+                                    <input type="hidden" name="status" value="2" />
+                                    <button class="btn btn-danger btn-sm px-3">Reject</button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@* 
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
+    <div class="col-md-8 col-lg-6">
+        <h3 class="mb-4 text-center">Warranty Pending</h3>
+
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th> <!-- Last column -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>John Doe</td>
+                    <td>john@example.com</td>
+                    <td>+91-9876543210</td>
+                    <td>Pending</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-success btn-sm px-3">Accept</button>
+                            <button class="btn btn-danger btn-sm px-3">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Jane Smith</td>
+                    <td>jane@example.com</td>
+                    <td>+91-9123456789</td>
+                    <td>Pending</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-success btn-sm px-3">Accept</button>
+                            <button class="btn btn-danger btn-sm px-3">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- More rows as needed -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+ *@
