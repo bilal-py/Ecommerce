@@ -7,7 +7,7 @@
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="col-md-12 col-lg-8">
-        <div class="container bg-white shadow p-4 rounded">
+        <div class="container bg-white shadow p-4 rounded"  style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
             <h3 class="text-center mb-4 fw-bold">Warranty Card</h3>
             @* Success Alert *@
             @if (TempData["SuccessMessage"] != null)
@@ -32,7 +32,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <!-- Roll Number -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label asp-for="RollNumber" class="form-label"></label>
                     <input asp-for="RollNumber" class="form-control form-control-sm" id="RollNumber" />
                     <span asp-validation-for="RollNumber" class="text-danger"></span>
@@ -40,45 +40,45 @@
                 </div>
 
                 <!-- Customer & Dealer -->
-                <h5 class="mt-4">Customer Details</h5>
+                <h5 class="mt-3 text-white">Customer Details</h5>
                 <!-- Customer Name -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">Customer Name</label>
                     <input type="text" id="CustomerName" name="Customer.CustomerName" class="form-control form-control-sm" required />
                 </div>
 
                 <!-- Email -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">Email</label>
                     <input type="email" id="CustomerEmail" name="Customer.Email" class="form-control form-control-sm" required />
                 </div>
 
                 <!-- Phone -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">Phone</label>
                     <input type="tel" id="PhoneNumber" name="Customer.PhoneNumber" class="form-control form-control-sm" />
                 </div>
 
                 <!-- Address -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">Address</label>
                     <input type="text" id="Address" name="Customer.Address" class="form-control form-control-sm" />
                 </div>
 
                 <!-- City -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">City</label>
                     <input type="text" id="City" name="Customer.City" class="form-control form-control-sm" />
                 </div>
 
                 <!-- State -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">State</label>
                     <input type="text" id="State" name="Customer.State" class="form-control form-control-sm" />
                 </div>
 
                 <!-- Zip -->
-                <div class="mb-3">
+                <div class="mb-3 text-white">
                     <label class="form-label">Zip</label>
                     <input type="text" id="Zip" name="Customer.Zip" class="form-control form-control-sm" />
                 </div>
@@ -90,22 +90,22 @@
                 <!-- Vehicle Information -->
                 <h5 class="mt-5">Vehicle Information</h5>
                 <div class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <label asp-for="VehicleYear" class="form-label"></label>
                         <input asp-for="VehicleYear" class="form-control form-control-sm" />
                         <span asp-validation-for="VehicleYear" class="text-danger"></span>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <label asp-for="VehicleMake" class="form-label"></label>
                         <input asp-for="VehicleMake" class="form-control form-control-sm" />
                         <span asp-validation-for="VehicleMake" class="text-danger"></span>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <label asp-for="VehicleModel" class="form-label"></label>
                         <input asp-for="VehicleModel" class="form-control form-control-sm" />
                         <span asp-validation-for="VehicleModel" class="text-danger"></span>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <label asp-for="VehicleVIN" class="form-label"></label>
                         <input asp-for="VehicleVIN" class="form-control form-control-sm" />
                         <span asp-validation-for="VehicleVIN" class="text-danger"></span>
@@ -131,7 +131,7 @@
                 <!-- Packages -->
                 <h5 class="mt-5">Packages</h5>
                 <div class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <div class="form-check">
                             <input asp-for="VehicleWrapFull" class="form-check-input" />
                             <label asp-for="VehicleWrapFull" class="form-check-label"></label>
@@ -145,7 +145,7 @@
                             <label asp-for="FrontLeadingEdge" class="form-check-label"></label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <div class="form-check">
                             <input asp-for="BumpersFront" class="form-check-input" />
                             <label asp-for="BumpersFront" class="form-check-label"></label>
@@ -163,7 +163,7 @@
                             <label asp-for="BumpersBack" class="form-check-label"></label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <div class="form-check">
                             <input asp-for="EdgeGuard" class="form-check-input" />
                             <label asp-for="EdgeGuard" class="form-check-label"></label>
@@ -181,7 +181,7 @@
                             <label asp-for="RoofFull" class="form-check-label"></label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-white">
                         <div class="form-check">
                             <input asp-for="HoodFull" class="form-check-input" />
                             <label asp-for="HoodFull" class="form-check-label"></label>
@@ -203,7 +203,7 @@
 
 
                 <!-- Submit -->
-                <div class="mt-4 text-center">
+                <div class="mt-3 text-white text-center">
                     <button type="submit" class="btn btn-primary px-4">Submit Warranty</button>
                 </div>
             </form>
