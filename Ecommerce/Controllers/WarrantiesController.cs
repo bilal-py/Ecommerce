@@ -309,7 +309,8 @@ using System.Threading.Tasks;
                 await _context.SaveChangesAsync();
                 warranty.CustomerId = customer.CustomerId;
             }
-
+            warranty.WarrantyStartDate = DateTime.SpecifyKind(warranty.WarrantyStartDate, DateTimeKind.Utc);
+            warranty.WarrantyEndDate = DateTime.SpecifyKind(warranty.WarrantyEndDate, DateTimeKind.Utc);
             warranty.Customer = null;
             warranty.WarrantyId = Guid.NewGuid();
             warranty.Status = 0;
@@ -319,6 +320,7 @@ using System.Threading.Tasks;
 
             TempData["SuccessMessage"] = "Warranty submitted successfully!";
 
+            /// email part
             var adminEmail = _config["Email:AdminEmail"];
             var dealer = await _context.Dealers.FindAsync(warranty.DealerId);
 
