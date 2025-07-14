@@ -19,8 +19,9 @@ public class Program
         //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
         //    )
         //);
+        var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
         builder.Services.AddDbContext<MyContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         // Cookie authentication configuration
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
@@ -62,25 +63,33 @@ public class Program
     {
         if (!dbContext.Users.Any())
         {
+            var admin1Email = Environment.GetEnvironmentVariable("ADMIN1_EMAIL");
+            var admin1Username = Environment.GetEnvironmentVariable("ADMIN1_USERNAME");
+            var admin1Pass = Environment.GetEnvironmentVariable("ADMIN1_PASSWORD");
+            var admin2Email = Environment.GetEnvironmentVariable("ADMIN2_EMAIL");
+            var admin2Username = Environment.GetEnvironmentVariable("ADMIN2_USERNAME");
+            var admin2Pass = Environment.GetEnvironmentVariable("ADMIN2_PASSWORD");
+
             var users = new List<User>
             {
-                new User
-                {
-                    email = "nada.fcai@gmail.com",
-                    userName = "nadaabutaleb",
-                    password = "Nada2001#",
-                    Role = "Admin",
-                    Age= 22
-                },
-                new User
-                {
-                    email = "osama@gmail.com",
-                    userName = "osamaabutaleb",
-                    password = "Osama2006#",
-                    Role = "Admin",
-                    Age= 18
-                }
-            };
+            new User
+            {
+                email = admin1Email,
+                userName = admin1Username,
+                password = admin1Pass,
+                Role = "Admin",
+                Age= 22
+            },
+            new User
+            {
+                email = admin2Email,
+                userName = admin2Username,
+                password = admin2Pass,
+                Role = "Admin",
+                Age= 18
+            }
+        };
+
 
             dbContext.Users.AddRange(users);
             dbContext.SaveChanges();
