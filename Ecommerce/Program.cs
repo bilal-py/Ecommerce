@@ -13,13 +13,14 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        builder.Services.AddDbContext<MyContext>();
+        //builder.Services.AddDbContext<MyContext>();
 
         //builder.Services.AddDbContext<MyContext>(options =>
         //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
         //    )
         //);
-
+        builder.Services.AddDbContext<MyContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         // Cookie authentication configuration
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
