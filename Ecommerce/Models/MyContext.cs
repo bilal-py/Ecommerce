@@ -4,19 +4,14 @@ namespace Ecommerce.Models
 {
     public class MyContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // Constructor used by ASP.NET DI container
+        public MyContext(DbContextOptions<MyContext> options) : base(options)
         {
-            optionsBuilder.UseNpgsql("Host=crossover.proxy.rlwy.net;Port=26805;Database=railway;Username=postgres;Password=PGPASSWORD=qdomFgfvOxiNJwMOqjOhbXslnXSyFFRX");
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            //modelBuilder.Entity<Product>()
-            //    .Property(p => p.Price)
-            //    .HasPrecision(18, 2);
-
 
             modelBuilder.Entity<Warranty>()
                 .HasOne(w => w.Customer)
@@ -27,9 +22,7 @@ namespace Ecommerce.Models
                 .HasOne(w => w.Dealer)
                 .WithMany(d => d.Warranties)
                 .HasForeignKey(w => w.DealerId);
-          
         }
-
 
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Category> Categories { get; set; }
