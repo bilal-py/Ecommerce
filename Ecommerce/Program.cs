@@ -20,6 +20,7 @@ public class Program
         //    )
         //);
         var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
+        Console.WriteLine("DB Connection: " + connectionString); // Just for debugging
         builder.Services.AddDbContext<MyContext>(options =>
             options.UseNpgsql(connectionString));
 
