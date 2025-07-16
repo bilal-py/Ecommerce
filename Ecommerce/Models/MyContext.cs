@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Ecommerce.Models;
 
 namespace Ecommerce.Models
 {
@@ -30,5 +31,6 @@ namespace Ecommerce.Models
         public DbSet<Warranty> Warranties { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Dealer> Dealers { get; set; }
+        public DbSet<Ecommerce.Models.RegisteredRollNumbers> RegisteredRollNumber { get; set; } = default!;
     }
 }

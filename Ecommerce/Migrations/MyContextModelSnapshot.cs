@@ -123,6 +123,32 @@ namespace Ecommerce.Migrations
                     b.ToTable("Dealers");
                 });
 
+            modelBuilder.Entity("Ecommerce.Models.RegisteredRollNumbers", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RollNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegisteredRollNumber");
+                });
+
             modelBuilder.Entity("Ecommerce.Models.User", b =>
                 {
                     b.Property<int>("Id")

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ecommerce.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20250714051628_postgresRailway")]
-    partial class postgresRailway
+    [Migration("20250715203707_register")]
+    partial class register
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,32 @@ namespace Ecommerce.Migrations
                     b.HasKey("DealerId");
 
                     b.ToTable("Dealers");
+                });
+
+            modelBuilder.Entity("Ecommerce.Models.RegisteredRollNumbers", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RollNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegisteredRollNumber");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.User", b =>

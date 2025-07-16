@@ -1,39 +1,43 @@
-# Ignore system and tool metadata
+# Ignore user & IDE files
 **/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
 **/.project
 **/.settings
 **/.toolstarget
 **/.vs
 **/.vscode
 **/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/azds.yaml
-**/bin
-**/charts
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-*.db
 *.suo
 *.user
 *.log
 *.sqlite
 *.secrets.json
+
+# Ignore git and docker tooling
+**/.git
+**/.gitignore
+**/.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# Ignore build output
+**/bin/
+**/obj/
+
+# Ignore Kubernetes or Azure Dev files
+**/azds.yaml
+**/charts/
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Ignore frontend files (optional)
+**/node_modules/
+**/npm-debug.log
+
+# Ignore local environment secrets
 .env
 .env.*
 appsettings.Development.json
 
-# Ignore docker-compose if not used
-docker-compose.yml
-docker-compose.override.yml
-
-# Keep Dockerfile
-# DO NOT IGNORE Dockerfile unless you're 100% sure
-# Dockerfile
+# ✅ BUT DON'T IGNORE PROJECT FILES
+!Ecommerce/
+!Ecommerce/Ecommerce.csproj
