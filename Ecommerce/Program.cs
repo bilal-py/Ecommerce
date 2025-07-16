@@ -2,6 +2,7 @@
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 public class Program
 {
@@ -13,34 +14,25 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        // Direct environment variable access - this should work based on your debug output
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        // Try multiple ways to get the connection string
+        var connectionString = GetConnectionString(builder.Configuration);
 
-        Console.WriteLine($"Direct env var result: '{connectionString}'");
+        Console.WriteLine($"Connection string found: {!string.IsNullOrEmpty(connectionString)}");
         Console.WriteLine($"Connection string length: {connectionString?.Length ?? 0}");
-        Console.WriteLine($"Connection string is null or empty: {string.IsNullOrEmpty(connectionString)}");
 
         if (string.IsNullOrEmpty(connectionString))
         {
-            Console.WriteLine("ERROR: Connection string is still null or empty!");
-
-            // Let's try a different approach - check if there are any invisible characters
-            var rawEnvVar = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-            if (rawEnvVar != null)
+            Console.WriteLine("ERROR: No connection string found!");
+            Console.WriteLine("Available environment variables:");
+            foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
             {
-                Console.WriteLine($"Raw env var exists but is: '{rawEnvVar}'");
-                Console.WriteLine($"Raw env var length: {rawEnvVar.Length}");
-                Console.WriteLine($"Raw env var trimmed: '{rawEnvVar.Trim()}'");
-                connectionString = rawEnvVar.Trim();
+                if (env.Key.ToString().Contains("Connection") || env.Key.ToString().Contains("DATABASE"))
+                {
+                    Console.WriteLine($"  {env.Key}: {env.Value}");
+                }
             }
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException("Database connection string is required but not found or is empty.");
-            }
+            throw new InvalidOperationException("Database connection string is required but not found.");
         }
-
-        Console.WriteLine("✓ Using connection string successfully");
 
         builder.Services.AddDbContext<MyContext>(options =>
             options.UseNpgsql(connectionString));
@@ -71,7 +63,7 @@ public class Program
                 Console.WriteLine("Database migration completed successfully.");
 
                 // Seed data after migration
-                SeedUsers(dbContext);
+                SeedUsers(dbContext, app.Configuration);
             }
         }
         catch (Exception ex)
@@ -99,7 +91,44 @@ public class Program
         app.Run();
     }
 
-    private static void SeedUsers(MyContext dbContext)
+    private static string GetConnectionString(IConfiguration configuration)
+    {
+        // Method 1: Railway environment variable with double underscore (should work)
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Found connection string via ConnectionStrings__DefaultConnection");
+            return connectionString;
+        }
+
+        // Method 2: Standard configuration path (reads from appsettings + env vars)
+        connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Found connection string via GetConnectionString method");
+            return connectionString;
+        }
+
+        // Method 3: Direct configuration access
+        connectionString = configuration["ConnectionStrings:DefaultConnection"];
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Found connection string via configuration section");
+            return connectionString;
+        }
+
+        // Method 4: Railway's DATABASE_URL (if using Railway's built-in PostgreSQL)
+        connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Found connection string via DATABASE_URL");
+            return connectionString;
+        }
+
+        return null;
+    }
+
+    private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
     {
         try
         {
@@ -109,16 +138,32 @@ public class Program
             {
                 Console.WriteLine("No users found, seeding admin users...");
 
-                var admin1Email = Environment.GetEnvironmentVariable("ADMIN1_EMAIL");
-                var admin1Username = Environment.GetEnvironmentVariable("ADMIN1_USERNAME");
-                var admin1Pass = Environment.GetEnvironmentVariable("ADMIN1_PASSWORD");
-                var admin2Email = Environment.GetEnvironmentVariable("ADMIN2_EMAIL");
-                var admin2Username = Environment.GetEnvironmentVariable("ADMIN2_USERNAME");
-                var admin2Pass = Environment.GetEnvironmentVariable("ADMIN2_PASSWORD");
+                var admin1Email = GetConfigValue(configuration, "ADMIN1_EMAIL");
+                var admin1Username = GetConfigValue(configuration, "ADMIN1_USERNAME");
+                var admin1Pass = GetConfigValue(configuration, "ADMIN1_PASSWORD");
+                var admin2Email = GetConfigValue(configuration, "ADMIN2_EMAIL");
+                var admin2Username = GetConfigValue(configuration, "ADMIN2_USERNAME");
+                var admin2Pass = GetConfigValue(configuration, "ADMIN2_PASSWORD");
 
-                Console.WriteLine($"Admin1 Email: {admin1Email}");
-                Console.WriteLine($"Admin1 Username: {admin1Username}");
-                Console.WriteLine($"Admin1 Password: {(!string.IsNullOrEmpty(admin1Pass) ? "***SET***" : "NOT SET")}");
+                // Validate that all required environment variables are present
+                var requiredVars = new[]
+                {
+                    (admin1Email, "ADMIN1_EMAIL"),
+                    (admin1Username, "ADMIN1_USERNAME"),
+                    (admin1Pass, "ADMIN1_PASSWORD"),
+                    (admin2Email, "ADMIN2_EMAIL"),
+                    (admin2Username, "ADMIN2_USERNAME"),
+                    (admin2Pass, "ADMIN2_PASSWORD")
+                };
+
+                foreach (var (value, name) in requiredVars)
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        Console.WriteLine($"WARNING: Environment variable {name} is not set.");
+                        // Don't throw exception, just log warning for now
+                    }
+                }
 
                 // Only seed if we have at least one complete admin user
                 if (!string.IsNullOrEmpty(admin1Email) && !string.IsNullOrEmpty(admin1Username) && !string.IsNullOrEmpty(admin1Pass))
@@ -167,5 +212,11 @@ public class Program
             Console.WriteLine($"Error during user seeding: {ex.Message}");
             // Don't throw exception here, let the application continue
         }
+    }
+
+    private static string GetConfigValue(IConfiguration configuration, string key)
+    {
+        // Try configuration first, then environment variable
+        return configuration[key] ?? Environment.GetEnvironmentVariable(key);
     }
 }
