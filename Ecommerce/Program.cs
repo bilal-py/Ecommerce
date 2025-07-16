@@ -13,14 +13,9 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        //builder.Services.AddDbContext<MyContext>();
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        Console.WriteLine("DB Connection configured: " + (!string.IsNullOrEmpty(connectionString) ? "Yes" : "No"));
 
-        //builder.Services.AddDbContext<MyContext>(options =>
-        //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-        //    )
-        //);
-        var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
-        Console.WriteLine("DB Connection: " + connectionString); // Just for debugging
         builder.Services.AddDbContext<MyContext>(options =>
             options.UseNpgsql(connectionString));
 
@@ -41,7 +36,7 @@ public class Program
             dbContext.Database.Migrate();
 
             // Seed data after migration
-            SeedUsers(dbContext);
+            SeedUsers(dbContext, app.Configuration);
         }
 
         if (!app.Environment.IsDevelopment())
@@ -60,59 +55,59 @@ public class Program
         app.Run();
     }
 
-    private static void SeedUsers(MyContext dbContext)
+    private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
     {
         if (!dbContext.Users.Any())
         {
-            var admin1Email = Environment.GetEnvironmentVariable("ADMIN1_EMAIL");
-            var admin1Username = Environment.GetEnvironmentVariable("ADMIN1_USERNAME");
-            var admin1Pass = Environment.GetEnvironmentVariable("ADMIN1_PASSWORD");
-            var admin2Email = Environment.GetEnvironmentVariable("ADMIN2_EMAIL");
-            var admin2Username = Environment.GetEnvironmentVariable("ADMIN2_USERNAME");
-            var admin2Pass = Environment.GetEnvironmentVariable("ADMIN2_PASSWORD");
+            var admin1Email = configuration["ADMIN1_EMAIL"];
+            var admin1Username = configuration["ADMIN1_USERNAME"];
+            var admin1Pass = configuration["ADMIN1_PASSWORD"];
+            var admin2Email = configuration["ADMIN2_EMAIL"];
+            var admin2Username = configuration["ADMIN2_USERNAME"];
+            var admin2Pass = configuration["ADMIN2_PASSWORD"];
 
-            //    var users = new List<User>
-            //    {
-            //    new User
-            //    {
-            //        email = admin1Email,
-            //        userName = admin1Username,
-            //        password = admin1Pass,
-            //        Role = "Admin",
-            //        Age= 22
-            //    },
-            //    new User
-            //    {
-            //        email = admin2Email,
-            //        userName = admin2Username,
-            //        password = admin2Pass,
-            //        Role = "Admin",
-            //        Age= 18
-            //    }
-            //};
+            // Validate that all required environment variables are present
+            var requiredVars = new[]
+            {
+                (admin1Email, "ADMIN1_EMAIL"),
+                (admin1Username, "ADMIN1_USERNAME"),
+                (admin1Pass, "ADMIN1_PASSWORD"),
+                (admin2Email, "ADMIN2_EMAIL"),
+                (admin2Username, "ADMIN2_USERNAME"),
+                (admin2Pass, "ADMIN2_PASSWORD")
+            };
+
+            foreach (var (value, name) in requiredVars)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new InvalidOperationException($"Environment variable {name} is required but not set.");
+                }
+            }
 
             var users = new List<User>
             {
                 new User
                 {
-                    email = "nada.fcai@gmail.com",
-                    userName = "nadaabutaleb",
-                    password = "Nada2001#",
+                    email = admin1Email,
+                    userName = admin1Username,
+                    password = admin1Pass,
                     Role = "Admin",
-                    Age= 22
+                    Age = 22
                 },
                 new User
                 {
-                    email = "osama@gmail.com",
-                    userName = "osamaabutaleb",
-                    password = "Osama2006#",
+                    email = admin2Email,
+                    userName = admin2Username,
+                    password = admin2Pass,
                     Role = "Admin",
-                    Age= 18
+                    Age = 18
                 }
             };
 
             dbContext.Users.AddRange(users);
             dbContext.SaveChanges();
+            Console.WriteLine("Admin users seeded successfully.");
         }
     }
 }
