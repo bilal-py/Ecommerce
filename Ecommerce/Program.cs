@@ -1,4 +1,4 @@
-using Ecommerce.Models;
+﻿using Ecommerce.Models;
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +40,7 @@ public class Program
             }
         }
 
-        Console.WriteLine("? Using connection string successfully");
+        Console.WriteLine("✓ Using connection string successfully");
 
         builder.Services.AddDbContext<MyContext>(options =>
             options.UseNpgsql(connectionString));
