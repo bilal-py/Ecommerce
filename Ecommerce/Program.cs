@@ -71,26 +71,45 @@ public class Program
             var admin2Username = Environment.GetEnvironmentVariable("ADMIN2_USERNAME");
             var admin2Pass = Environment.GetEnvironmentVariable("ADMIN2_PASSWORD");
 
+            //    var users = new List<User>
+            //    {
+            //    new User
+            //    {
+            //        email = admin1Email,
+            //        userName = admin1Username,
+            //        password = admin1Pass,
+            //        Role = "Admin",
+            //        Age= 22
+            //    },
+            //    new User
+            //    {
+            //        email = admin2Email,
+            //        userName = admin2Username,
+            //        password = admin2Pass,
+            //        Role = "Admin",
+            //        Age= 18
+            //    }
+            //};
+
             var users = new List<User>
             {
-            new User
-            {
-                email = admin1Email,
-                userName = admin1Username,
-                password = admin1Pass,
-                Role = "Admin",
-                Age= 22
-            },
-            new User
-            {
-                email = admin2Email,
-                userName = admin2Username,
-                password = admin2Pass,
-                Role = "Admin",
-                Age= 18
-            }
-        };
-
+                new User
+                {
+                    email = "nada.fcai@gmail.com",
+                    userName = "nadaabutaleb",
+                    password = "Nada2001#",
+                    Role = "Admin",
+                    Age= 22
+                },
+                new User
+                {
+                    email = "osama@gmail.com",
+                    userName = "osamaabutaleb",
+                    password = "Osama2006#",
+                    Role = "Admin",
+                    Age= 18
+                }
+            };
 
             dbContext.Users.AddRange(users);
             dbContext.SaveChanges();

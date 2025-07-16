@@ -233,7 +233,7 @@
                     console.log("AJAX success", data);
 
                     if (data.exists) {
-                        $errorSpan.text('This Roll Number already exists.').show();
+                        $errorSpan.text('This Roll Number is incorrect or already exists.').show();
                         $rollInput.addClass('is-invalid');
                     } else {
                         $errorSpan.text('').hide();

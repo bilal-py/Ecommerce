@@ -74,6 +74,14 @@
 
                     @if (User.Identity.IsAuthenticated)
                     {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="RegisteredRollNumbers" asp-action="Create">Register Roll Number</a>
+                            </li>
+                        }
+
+
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Warranties" asp-action="Dashboard">Dashboard</a>
                         </li>

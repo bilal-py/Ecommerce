@@ -1,13 +1,13 @@
-﻿    using Ecommerce.Models;
-    using Ecommerce.Services;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Claims;
+﻿using Ecommerce.Models;
+using Ecommerce.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -345,82 +345,88 @@ using System.Threading.Tasks;
 
 
         [Authorize]
-            public async Task<IActionResult> WarrantyPendingPage(string dealerId)
+        public async Task<IActionResult> WarrantyPendingPage(string dealerId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            var user = await _context.Users.FindAsync(userId);
+
+            IQueryable<Warranty> query = _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Where(w => w.Status == 0); // Pending
+
+            if (role == "Dealer")
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var role = User.FindFirstValue(ClaimTypes.Role);
-                var user = await _context.Users.FindAsync(userId);
-
-                IQueryable<Warranty> query = _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Where(w => w.Status == 0); // Pending
-
-                if (role == "Dealer")
-                {
-                    query = query.Where(w => w.DealerId == user.DealerId);
-                }
-
-                var warranties = await query.ToListAsync();
-
-                return PartialView("_WarrantyPending", warranties); 
+                query = query.Where(w => w.DealerId == user.DealerId);
             }
 
-            [Authorize]
-            public async Task<IActionResult> WarrantyApprovedPage(string dealerId)
+            var warranties = await query.ToListAsync();
+
+            return PartialView("_WarrantyPending", warranties); 
+        }
+
+        [Authorize]
+        public async Task<IActionResult> WarrantyApprovedPage(string dealerId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            var user = await _context.Users.FindAsync(userId);
+
+            IQueryable<Warranty> query = _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Where(w => w.Status == 1); // Approved
+
+            if (role == "Dealer")
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var role = User.FindFirstValue(ClaimTypes.Role);
-                var user = await _context.Users.FindAsync(userId);
-
-                IQueryable<Warranty> query = _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Where(w => w.Status == 1); // Approved
-
-                if (role == "Dealer")
-                {
-                    query = query.Where(w => w.DealerId == user.DealerId);
-                }
-
-                var warranties = await query.ToListAsync();
-
-                return PartialView("_WarrantyApproved", warranties);
+                query = query.Where(w => w.DealerId == user.DealerId);
             }
 
+            var warranties = await query.ToListAsync();
 
-            [HttpPost]
-            [Authorize(Roles = "Admin")]
-            public async Task<IActionResult> UpdateStatus(Guid warrantyId, int status)
+            return PartialView("_WarrantyApproved", warranties);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateStatus(Guid warrantyId, int status)
+        {
+            var warranty = await _context.Warranties.FindAsync(warrantyId);
+            if (warranty == null) return NotFound();
+
+            warranty.Status = status;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Dashboard");
+        }
+
+        [HttpGet]
+        public IActionResult CheckRollNumberForDealer(string rollNumber)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            // Dealers can only use roll numbers that are:
+
+            // Registered (by admin), and
+
+            // Not already used by that dealer in previous submissions.
+            
+
+            if (user?.DealerId == null)
             {
-                var warranty = await _context.Warranties.FindAsync(warrantyId);
-                if (warranty == null) return NotFound();
-
-                warranty.Status = status;
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Dashboard");
+                return Json(new { exists = false }); // or return error
             }
+            bool rollNumberExists = _context.RegisteredRollNumber.Any(r =>
+                r.RollNumber == rollNumber);
+            bool exists = _context.Warranties.Any(w =>
+                w.RollNumber == rollNumber && w.DealerId == user.DealerId);
 
-            [HttpGet]
-            public IActionResult CheckRollNumberForDealer(string rollNumber)
-            {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-
-
-                if (user?.DealerId == null)
-                {
-                    return Json(new { exists = false }); // or return error
-                }
-
-                bool exists = _context.Warranties.Any(w =>
-                    w.RollNumber == rollNumber && w.DealerId == user.DealerId);
-
-                return Json(new { exists });
-            }
-            private string BuildWarrantyEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer)
-            {
+            return Json(new { exists = exists || !rollNumberExists });
+        }
+        private string BuildWarrantyEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer)
+        {
             var sb = new StringBuilder();
             sb.AppendLine("<p>Hello</p>");
             sb.AppendLine($"<p>Thank you for choosing MotoProtekt. Your Product Roll Number is <strong>{warranty.RollNumber}</strong>. Series : prime. Warranty Period : 1yr warranty on yellowing & 5 yrs warranty on Bubbling and chipping.<br />For any queries please contact us on <a href='mailto:support@motoprotekt.de'>support@motoprotekt.de</a></p>");
@@ -480,8 +486,6 @@ using System.Threading.Tasks;
             sb.AppendLine("</table>");
 
             return sb.ToString();
-
         }
-
     }
-    }
+}
