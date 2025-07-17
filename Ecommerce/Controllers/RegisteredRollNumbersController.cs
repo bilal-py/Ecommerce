@@ -47,7 +47,17 @@ namespace Ecommerce.Controllers
         // GET: RegisteredRollNumbers/Create
         public IActionResult Create()
         {
-            return View();
+            var viewModel = new RegisteredRollNumbers
+            {
+                Status = "Active",
+                CategoryList = new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "Prime", Text = "Prime" },
+                    new SelectListItem { Value = "Ultimate", Text = "Ultimate" },
+                    new SelectListItem { Value = "Ultimate Plus", Text = "Ultimate Plus" }
+                }
+            };
+            return View(viewModel);
         }
 
         // POST: RegisteredRollNumbers/Create

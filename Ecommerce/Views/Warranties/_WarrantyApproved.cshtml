@@ -14,6 +14,11 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Dealer</th>
+                    <th>Vehicle Year</th>
+                    <th>Vehicle Make</th>
+                    <th>Vehicle Model</th>
+                    <th>Warranty Start Date</th>
+                    <th>Roll Number</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -27,6 +32,11 @@
                         <td>@item.Customer?.Email</td>
                         <td>@item.Customer?.PhoneNumber</td>
                         <td>@item.Dealer?.DealerName</td>
+                        <td>@item.VehicleYear</td>
+                        <td>@item.VehicleMake</td>
+                        <td>@item.VehicleModel</td>
+                        <td>@item.WarrantyStartDate</td>
+                        <td>@item.RollNumber</td>
                         <td>Approved</td>
                     </tr>
                 }
