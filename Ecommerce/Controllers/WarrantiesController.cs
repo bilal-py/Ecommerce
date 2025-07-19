@@ -26,14 +26,14 @@ using System.Threading.Tasks;
                 _config = config;
             }
 
-
+            [Authorize]
             // GET: Warranties
             public async Task<IActionResult> Index()
             {
                 var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer);
                 return View(await myContext.ToListAsync());
             }
-
+            [Authorize]
             // GET: Warranties/Details/5
             public async Task<IActionResult> Details(Guid? id)
             {
@@ -53,7 +53,8 @@ using System.Threading.Tasks;
 
                 return View(warranty);
             }
-
+            
+            [Authorize]
             // GET: Warranties/Create
             public IActionResult Create()
             {
@@ -67,6 +68,7 @@ using System.Threading.Tasks;
             // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
             [HttpPost]
             [ValidateAntiForgeryToken]
+            [Authorize]
             public async Task<IActionResult> Create(Warranty warranty, Customer customer)
             {
                 if (ModelState.IsValid)
@@ -96,7 +98,7 @@ using System.Threading.Tasks;
                 return View(warranty);
             }
 
-
+            [Authorize]
             // GET: Warranties/Edit/5
             public async Task<IActionResult> Edit(Guid? id)
             {
@@ -120,6 +122,7 @@ using System.Threading.Tasks;
             // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
             [HttpPost]
             [ValidateAntiForgeryToken]
+            [Authorize]
             public async Task<IActionResult> Edit(Guid id, [Bind("WarrantyId,RollNumber,Status,WarrantyStartDate,WarrantyEndDate,VehicleYear,VehicleMake,VehicleModel,VehicleVIN,CustomerId,DealerId,BumpersFront,HoodLead,Mirrors,BumpersBack,EdgeGuard,Windshield,FendersLead,RoofFull,HoodFull,RoofLead,Headlamps,Trunk")] Warranty warranty)
             {
                 if (id != warranty.WarrantyId)
@@ -151,7 +154,8 @@ using System.Threading.Tasks;
                 ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
                 return View(warranty);
             }
-
+            
+            [Authorize]
             // GET: Warranties/Delete/5
             public async Task<IActionResult> Delete(Guid? id)
             {
@@ -171,7 +175,7 @@ using System.Threading.Tasks;
 
                 return View(warranty);
             }
-
+            [Authorize]
             // POST: Warranties/Delete/5
             [HttpPost, ActionName("Delete")]
             [ValidateAntiForgeryToken]
@@ -197,6 +201,7 @@ using System.Threading.Tasks;
             }
 
             [HttpGet]
+            [Authorize]
             public IActionResult GetCustomerByEmail(string email)
             {
                 var customer = _context.Customers.FirstOrDefault(c => c.Email == email);
@@ -214,7 +219,7 @@ using System.Threading.Tasks;
                 });
             }
 
-
+            [Authorize]
             // GET: /Dashboard
             public IActionResult Dashboard()
             {
@@ -224,7 +229,7 @@ using System.Threading.Tasks;
 
                 return View();
             }
-
+            [Authorize]
             // GET: /Dashboard/WarrantyRegistration
             public IActionResult WarrantyRegistration()
             {
@@ -280,6 +285,7 @@ using System.Threading.Tasks;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> SaveWarrantyFromDashboard(Warranty warranty, Customer customer)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));

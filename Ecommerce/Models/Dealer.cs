@@ -9,8 +9,11 @@ namespace Ecommerce.Models
 
         [Required]
         public string DealerName { get; set; }
-
-        public string? Location { get; set; }
+        [Phone]
+        public string? Contact { get; set; }
+        public string? Address { get; set; }
+        public string? GSTNumber { get; set; }
+        public string? FirmName { get; set; }
 
         [Required]
         public string Email { get; set; }
