@@ -63,6 +63,12 @@ namespace Ecommerce.Controllers
             return LocalRedirect("/");
         }
 
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult CreateAccount()
         {

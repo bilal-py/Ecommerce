@@ -42,6 +42,7 @@ public class Program
         {
             options.LoginPath = "/Account/Login";
             options.LogoutPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
             options.Cookie.Name = "Home";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ?
