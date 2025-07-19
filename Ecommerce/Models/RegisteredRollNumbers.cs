@@ -21,10 +21,10 @@ namespace Ecommerce.Models
 
         [NotMapped]
         public List<SelectListItem> CategoryList { get; set; } = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "A", Text = "Prime" },
-        new SelectListItem { Value = "B", Text = "Ultimate" },
-        new SelectListItem { Value = "C", Text = "Ultimate Plus" }
-    };
+        {
+            new SelectListItem { Value = "A", Text = "Prime" },
+            new SelectListItem { Value = "B", Text = "Ultimate" },
+            new SelectListItem { Value = "C", Text = "Ultimate Plus" }
+        };
     }
 }

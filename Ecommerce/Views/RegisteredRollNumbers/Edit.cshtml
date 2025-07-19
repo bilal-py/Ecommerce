@@ -5,39 +5,49 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+        <div class="col-md-6">
+            <div class="p-4" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+                <h1 class="my-h1 text-white">Edit Registered Roll Number</h1>
+            </div>
+            <div class="p-4 mt-3" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
 
-<h4>RegisteredRollNumbers</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="RollNumber" class="control-label"></label>
-                <input asp-for="RollNumber" class="form-control" />
-                <span asp-validation-for="RollNumber" class="text-danger"></span>
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="RollNumber" class="control-label"></label>
+                        <input asp-for="RollNumber" class="form-control" />
+                        <span asp-validation-for="RollNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3 text-white">
+                        <label asp-for="Category" class="control-label"></label>
+                        <select asp-for="Category" class="form-control" asp-items="Model.CategoryList">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="RegistrationDate" class="control-label"></label>
+                        <input asp-for="RegistrationDate" class="form-control" />
+                        <span asp-validation-for="RegistrationDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Status" class="control-label"></label>
+                        <input asp-for="Status" class="form-control" />
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3 text-center mt-3">
+                        <input type="submit" value="Update" class="btn btn-primary" style="background-color: #6d36e4;" />
+                    </div>
+                    <div class=" align-items-left mt-3">
+                        <a asp-action="Index" class="btn btn-secondary" style=" background-color: #6d36e4;">Back to List</a>
+                    </div>
+                </form>
+               
             </div>
-            <div class="form-group">
-                <label asp-for="Category" class="control-label"></label>
-                <input asp-for="Category" class="form-control" />
-                <span asp-validation-for="Category" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RegistrationDate" class="control-label"></label>
-                <input asp-for="RegistrationDate" class="form-control" />
-                <span asp-validation-for="RegistrationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

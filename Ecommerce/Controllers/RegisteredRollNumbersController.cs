@@ -58,14 +58,9 @@ namespace Ecommerce.Controllers
             var viewModel = new RegisteredRollNumbers
             {
                 Status = "Active",
-                CategoryList = new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "Prime", Text = "Prime" },
-                    new SelectListItem { Value = "Ultimate", Text = "Ultimate" },
-                    new SelectListItem { Value = "Ultimate Plus", Text = "Ultimate Plus" }
-                }
+                CategoryList = GetCategoryList()
             };
-            return View(viewModel);
+            return View(viewModel); 
         }
 
         // POST: RegisteredRollNumbers/Create
@@ -87,8 +82,11 @@ namespace Ecommerce.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            registeredRollNumbers.CategoryList = GetCategoryList();
+
             return View(registeredRollNumbers);
         }
+
         [Authorize(Roles = "Admin")]
 
         // GET: RegisteredRollNumbers/Edit/5
@@ -125,6 +123,7 @@ namespace Ecommerce.Controllers
             {
                 try
                 {
+                    registeredRollNumbers.RegistrationDate = DateTime.SpecifyKind(registeredRollNumbers.RegistrationDate, DateTimeKind.Utc);
                     _context.Update(registeredRollNumbers);
                     await _context.SaveChangesAsync();
                 }
@@ -189,5 +188,16 @@ namespace Ecommerce.Controllers
         {
           return (_context.RegisteredRollNumber?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        private List<SelectListItem> GetCategoryList()
+        {
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Prime", Text = "Prime" },
+                new SelectListItem { Value = "Ultimate", Text = "Ultimate" },
+                new SelectListItem { Value = "Ultimate Plus", Text = "Ultimate Plus" }
+            };
+        }
+
     }
 }

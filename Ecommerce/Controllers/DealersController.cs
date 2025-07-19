@@ -55,7 +55,7 @@ namespace Ecommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DealerId,DealerName,Location,Email")] Dealer dealer)
+        public async Task<IActionResult> Create([Bind("DealerId,DealerName,Contact,Address,GSTNumber,FirmName,Email")] Dealer dealer)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +88,7 @@ namespace Ecommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("DealerId,DealerName,Location,Email")] Dealer dealer)
+        public async Task<IActionResult> Edit(Guid id, [Bind("DealerId,DealerName,Contact,Address,GSTNumber,FirmName,Email")] Dealer dealer)
         {
             if (id != dealer.DealerId)
             {
