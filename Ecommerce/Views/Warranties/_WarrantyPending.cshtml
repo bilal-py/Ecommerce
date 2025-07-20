@@ -4,6 +4,14 @@
     ViewData["Title"] = "WarrantyPendingPage";
     var isAdmin = User.IsInRole("Admin");
 }
+@{
+    var categoryNames = new Dictionary<string, string>
+    {
+        { "A", "Prime" },
+        { "B", "Ultimate" },
+        { "C", "Ultimate Plus" }
+    };
+}
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
     <div class="">
@@ -22,6 +30,7 @@
                     <th>Vehicle Model</th>
                     <th>Warranty Start Date</th>
                     <th>Roll Number</th>
+                    <th>Warranty Period</th>
                     <th>Status</th>
                     @if (isAdmin)
                     {
@@ -43,7 +52,14 @@
                         <td>@item.VehicleMake</td>
                         <td>@item.VehicleModel</td>
                         <td>@item.WarrantyStartDate</td>
-                        <td>@item.RollNumber</td>                
+                        <td>@item.RollNumber</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.RegisteredRollNumber?.Category) && categoryNames.TryGetValue(item.RegisteredRollNumber.Category, out var friendlyName))
+                            {
+                                @friendlyName
+                            }
+                        </td>
+
 
                         <td>Pending</td>
 

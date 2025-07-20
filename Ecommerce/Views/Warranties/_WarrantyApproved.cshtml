@@ -2,6 +2,15 @@
 @{
     ViewData["Title"] = "WarrantyApprovedPage";
 }
+@{
+    var categoryNames = new Dictionary<string, string>
+    {
+        { "A", "Prime" },
+        { "B", "Ultimate" },
+        { "C", "Ultimate Plus" }
+    };
+}
+
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
     <div class="col-md-10">
@@ -19,6 +28,7 @@
                     <th>Vehicle Model</th>
                     <th>Warranty Start Date</th>
                     <th>Roll Number</th>
+                    <th>Warranty Period</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -37,6 +47,13 @@
                         <td>@item.VehicleModel</td>
                         <td>@item.WarrantyStartDate</td>
                         <td>@item.RollNumber</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.RegisteredRollNumber?.Category) && categoryNames.TryGetValue(item.RegisteredRollNumber.Category, out var friendlyName))
+                            {
+                                @friendlyName
+                            }
+                        </td>
+
                         <td>Approved</td>
                     </tr>
                 }

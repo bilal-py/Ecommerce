@@ -30,8 +30,8 @@ using System.Threading.Tasks;
             // GET: Warranties
             public async Task<IActionResult> Index()
             {
-                var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer);
-                return View(await myContext.ToListAsync());
+                var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer).Include(w => w.RegisteredRollNumber);
+            return View(await myContext.ToListAsync());
             }
             [Authorize]
             // GET: Warranties/Details/5
@@ -45,6 +45,7 @@ using System.Threading.Tasks;
                 var warranty = await _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .FirstOrDefaultAsync(m => m.WarrantyId == id);
                 if (warranty == null)
                 {
@@ -167,6 +168,7 @@ using System.Threading.Tasks;
                 var warranty = await _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .FirstOrDefaultAsync(m => m.WarrantyId == id);
                 if (warranty == null)
                 {
@@ -247,6 +249,7 @@ using System.Threading.Tasks;
                 IQueryable<Warranty> query = _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .Where(w => w.Status == 0); // Pending
 
                 if (role == "Dealer")
@@ -271,6 +274,7 @@ using System.Threading.Tasks;
                 IQueryable<Warranty> query = _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .Where(w => w.Status == 1); // Approved
 
                 if (role == "Dealer")
@@ -286,7 +290,7 @@ using System.Threading.Tasks;
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> SaveWarrantyFromDashboard(Warranty warranty, Customer customer)
+        public async Task<IActionResult> SaveWarrantyFromDashboard(Warranty warranty, Customer customer, RegisteredRollNumbers registeredRollNumbers)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = await _context.Users.FindAsync(userId);
@@ -321,6 +325,23 @@ using System.Threading.Tasks;
             warranty.WarrantyId = Guid.NewGuid();
             warranty.Status = 0;
 
+            //
+
+            var registeredRollNumber = await _context.RegisteredRollNumber
+                .FirstOrDefaultAsync(r => r.RollNumber == warranty.RollNumber);
+
+            if (registeredRollNumber != null)
+            {
+                warranty.RegisteredRollNumberId = registeredRollNumber.Id;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid roll number.";
+                return RedirectToAction("Dashboard");
+            }
+
+
+            //
             _context.Warranties.Add(warranty);
             await _context.SaveChangesAsync();
 
@@ -330,11 +351,13 @@ using System.Threading.Tasks;
             var adminEmail = _config["Email:AdminEmail"];
             var dealer = await _context.Dealers.FindAsync(warranty.DealerId);
 
-            // TEMP EMAILS (Replace with real ones)
-            var dealerEmail = "reta76@ethereal.email";
-            var customerEmail = "reta76@ethereal.email";
 
-            string emailBody = BuildWarrantyEmailTemplate(warranty, customer, dealer);
+
+            // TEMP EMAILS (Replace with real ones)
+            var dealerEmail = _config["Email:AdminEmail"]; // "reta76@ethereal.email";
+            var customerEmail = _config["Email:AdminEmail"];
+
+            string emailBody = BuildWarrantyEmailTemplate(warranty, customer, dealer, registeredRollNumber);
 
             await _emailService.SendEmailAsync(
                 to: customerEmail,
@@ -342,9 +365,6 @@ using System.Threading.Tasks;
                 body: emailBody,
                 cc: new List<string> { dealerEmail, adminEmail }
             );
-            //if (!string.IsNullOrEmpty(dealerEmail))
-            //    await _emailService.SendEmailAsync(dealerEmail, "New Warranty Submitted", emailBody);
-            //await _emailService.SendEmailAsync(adminEmail, "Warranty Submission Alert", emailBody);
 
             return RedirectToAction("Dashboard");
         }
@@ -360,6 +380,7 @@ using System.Threading.Tasks;
             IQueryable<Warranty> query = _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
                 .Where(w => w.Status == 0); // Pending
 
             if (role == "Dealer")
@@ -382,6 +403,7 @@ using System.Threading.Tasks;
             IQueryable<Warranty> query = _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
                 .Where(w => w.Status == 1); // Approved
 
             if (role == "Dealer")
@@ -431,19 +453,8 @@ using System.Threading.Tasks;
 
             return Json(new { exists = exists || !rollNumberExists });
         }
-        private string BuildWarrantyEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer)
+        private string BuildWarrantyEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer, RegisteredRollNumbers? registeredRollNumbers)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("<p>Hello</p>");
-            sb.AppendLine($"<p>Thank you for choosing MotoProtekt. Your Product Roll Number is <strong>{warranty.RollNumber}</strong>. Series : prime. Warranty Period : 1yr warranty on yellowing & 5 yrs warranty on Bubbling and chipping.<br />For any queries please contact us on <a href='mailto:support@motoprotekt.de'>support@motoprotekt.de</a></p>");
-
-            sb.AppendLine("<table border='1' cellpadding='6' cellspacing='0' style='border-collapse: collapse; font-family: Arial; font-size: 14px;'>");
-            sb.AppendLine("<tr><th colspan='2' style='background-color: #f2f2f2;'>Vehicle Information</th></tr>");
-            sb.AppendLine($"<tr><td><strong>Year</strong></td><td>{warranty.VehicleYear}</td></tr>");
-            sb.AppendLine($"<tr><td><strong>Make</strong></td><td>{warranty.VehicleMake}</td></tr>");
-            sb.AppendLine($"<tr><td><strong>Model</strong></td><td>{warranty.VehicleModel}</td></tr>");
-            sb.AppendLine($"<tr><td><strong>Vin</strong></td><td>{warranty.VehicleVIN}</td></tr>");
-
             // Define the mappings
             var individualNames = new Dictionary<string, bool>
             {
@@ -469,16 +480,49 @@ using System.Threading.Tasks;
                 { "Front - Leading Edge", warranty.FrontLeadingEdge }
             };
 
-            // Add hardcoded packages if needed (since your model has only checkboxes for individuals)
-            var packageItems = packageNames.Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .ToList();
 
-            // Filter selected items
-            var individualItems = individualNames
-                .Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .ToList();
+
+
+            string? categoryKey = registeredRollNumbers?.Category;
+            var categoryDetails = new Dictionary<string, (string Name, string Description)>
+            {
+                { "A", ("Prime", "5yrs warranty on bubbling, chipping, and cracking & 1yr on yellowing") },
+                { "B", ("Ultimate", "7yr warranty & 3yr warranty on yellowing") },
+                { "C", ("Ultimate Plus", "10yrs warranty & 5yr on yellowing") }
+            };
+
+            string categoryName = "Unknown";
+            string categoryDescription = "No warranty description available";
+
+            if (!string.IsNullOrEmpty(categoryKey) && categoryDetails.TryGetValue(categoryKey, out var detail))
+            {
+                categoryName = detail.Name;
+                categoryDescription = detail.Description;
+            }
+
+
+
+
+
+
+            var packageItems = packageNames.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+            var individualItems = individualNames.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+
+
+            var sb = new StringBuilder();
+            sb.AppendLine("<p>Hello</p>");
+            sb.AppendLine($"<p>Thank you for choosing MotoProtekt. Your Product Roll Number is <strong>{warranty.RollNumber}</strong>.</p>");
+            sb.AppendLine($"<p>Series: <strong>{categoryName}</strong><br />Warranty Period: {categoryDescription}<br />For any queries please contact us at <a href='mailto:support@motoprotekt.de'>support@motoprotekt.de</a></p>");
+
+            sb.AppendLine("<table border='1' cellpadding='6' cellspacing='0' style='border-collapse: collapse; font-family: Arial; font-size: 14px;'>");
+            sb.AppendLine("<tr><th colspan='2' style='background-color: #f2f2f2;'>Vehicle Information</th></tr>");
+            sb.AppendLine($"<tr><td><strong>Year</strong></td><td>{warranty.VehicleYear}</td></tr>");
+            sb.AppendLine($"<tr><td><strong>Make</strong></td><td>{warranty.VehicleMake}</td></tr>");
+            sb.AppendLine($"<tr><td><strong>Model</strong></td><td>{warranty.VehicleModel}</td></tr>");
+            sb.AppendLine($"<tr><td><strong>Vin</strong></td><td>{warranty.VehicleVIN}</td></tr>");
+
+            
+            
 
             sb.AppendLine("<tr><td><strong>Packages</strong></td><td>");
             sb.AppendLine(string.Join(", ", packageItems));

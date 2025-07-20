@@ -26,5 +26,6 @@ namespace Ecommerce.Models
             new SelectListItem { Value = "B", Text = "Ultimate" },
             new SelectListItem { Value = "C", Text = "Ultimate Plus" }
         };
+        public ICollection<Warranty> ?Warranties { get; set; }
     }
 }
