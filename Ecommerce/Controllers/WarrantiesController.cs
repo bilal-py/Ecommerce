@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -354,10 +355,17 @@ using System.Threading.Tasks;
 
 
             // TEMP EMAILS (Replace with real ones)
-            var dealerEmail = _config["Email:AdminEmail"]; // "reta76@ethereal.email";
-            var customerEmail = _config["Email:AdminEmail"];
+           
+            var dealerEmail = dealer?.Email ?? _config["Email:AdminEmail"];
+            var customerEmail = customer?.Email ?? _config["Email:AdminEmail"];
 
-            string emailBody = BuildWarrantyEmailTemplate(warranty, customer, dealer, registeredRollNumber);
+            var sb = new StringBuilder();
+            sb.AppendLine("<p>Hello</p>");
+
+            string body = BuildWarrantyEmailTemplate(warranty, customer, dealer, registeredRollNumber);
+            sb.AppendLine(body);
+
+            string emailBody = sb.ToString();
 
             await _emailService.SendEmailAsync(
                 to: customerEmail,
@@ -416,19 +424,60 @@ using System.Threading.Tasks;
             return PartialView("_WarrantyApproved", warranties);
         }
 
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStatus(Guid warrantyId, int status)
         {
-            var warranty = await _context.Warranties.FindAsync(warrantyId);
+            var warranty = await _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
+                .FirstOrDefaultAsync(w => w.WarrantyId == warrantyId);
+
             if (warranty == null) return NotFound();
 
             warranty.Status = status;
             await _context.SaveChangesAsync();
 
+            // Prepare email details
+            var customer = warranty.Customer;
+            var dealer = warranty.Dealer;
+            var registeredRollNumber = warranty.RegisteredRollNumber;
+
+            var adminEmail = _config["Email:AdminEmail"];
+            var dealerEmail = dealer?.Email ?? _config["Email:AdminEmail"];
+            var customerEmail = customer?.Email ?? _config["Email:AdminEmail"];
+
+            string decision = status == 1 ? "approved" : "rejected";
+
+            string body;
+            string subject = status == 1
+                ? "Your MotoProtekt Warranty Has Been Approved!"
+                : "Update on Your MotoProtekt Warranty Request";
+
+            if (status == 1)
+            {
+                // build using the approved template above
+                body = BuildApprovedEmailTemplate(warranty, customer, dealer, registeredRollNumber);
+            }
+            else
+            {
+                // build using the rejected template above
+                body = BuildRejectedEmailTemplate(warranty, customer, dealer, registeredRollNumber);
+            }
+
+
+
+            await _emailService.SendEmailAsync(
+                to: customerEmail,
+                subject: subject,
+                body: body,
+                cc: new List<string> { dealerEmail, adminEmail }
+            );
+
             return RedirectToAction("Dashboard");
         }
+
 
         [HttpGet]
         public IActionResult CheckRollNumberForDealer(string rollNumber)
@@ -510,7 +559,6 @@ using System.Threading.Tasks;
 
 
             var sb = new StringBuilder();
-            sb.AppendLine("<p>Hello</p>");
             sb.AppendLine($"<p>Thank you for choosing MotoProtekt. Your Product Roll Number is <strong>{warranty.RollNumber}</strong>.</p>");
             sb.AppendLine($"<p>Series: <strong>{categoryName}</strong><br />Warranty Period: {categoryDescription}<br />For any queries please contact us at <a href='mailto:support@motoprotekt.de'>support@motoprotekt.de</a></p>");
 
@@ -537,5 +585,38 @@ using System.Threading.Tasks;
 
             return sb.ToString();
         }
+
+        private string BuildApprovedEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer, RegisteredRollNumbers? registeredRollNumbers)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"<p>Dear {customer.CustomerName},</p>");
+            sb.AppendLine("<p>We're pleased to let you know that your warranty request has been <strong>approved</strong>!</p>");
+            sb.AppendLine("<p>Below are your warranty details:</p>");
+            sb.AppendLine(BuildWarrantyEmailTemplate(warranty, customer, dealer, registeredRollNumbers));
+            sb.AppendLine("<p>If you have any questions, our support team is ready to assist—just reply to this email or call us at [support number].</p>");
+            sb.AppendLine("<p>Thank you for choosing MotoProtekt!</p>");
+            sb.AppendLine("<p>Warm regards,<br/>MotoProtekt Support Team</p>");
+            return sb.ToString();
+        }
+
+        private string BuildRejectedEmailTemplate(Warranty warranty, Customer customer, Dealer? dealer, RegisteredRollNumbers? registeredRollNumbers)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"<p>Dear {customer.CustomerName},</p>");
+            sb.AppendLine("<p>Thank you for submitting your warranty request. Unfortunately, it has been <strong>rejected</strong>.</p>");
+            sb.AppendLine($"<p><strong>Roll Number:</strong> {warranty.RollNumber}</p>");
+            sb.AppendLine("<p>This decision could be due to one of the following:</p>");
+            sb.AppendLine("<ul>" +
+                          "<li>Invalid or unregistered roll number</li>" +
+                          "<li>Warranty period has expired</li>" +
+                          "<li>Required documentation/information missing</li>" +
+                          "</ul>");
+            sb.AppendLine("<p>If you'd like us to review again, please reply with additional details or contact our support team.</p>");
+            sb.AppendLine("<p>We apologize for any inconvenience and are here to help.</p>");
+            sb.AppendLine("<p>Best regards,<br/>MotoProtekt Support Team</p>");
+
+            return sb.ToString();
+        }
+
     }
 }
