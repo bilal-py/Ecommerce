@@ -25,6 +25,10 @@ namespace Ecommerce.Models
 
         public Guid DealerId { get; set; }
         public Dealer Dealer { get; set; }
+        public Guid? RegisteredRollNumberId { get; set; }
+
+        [ForeignKey("RegisteredRollNumberId")]
+        public RegisteredRollNumbers? RegisteredRollNumber { get; set; }
 
         public bool VehicleWrapFull { get; set; }
         public bool FrontFull{ get; set; }

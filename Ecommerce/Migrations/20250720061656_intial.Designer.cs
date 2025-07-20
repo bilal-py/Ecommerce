@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ecommerce.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20250715203707_register")]
-    partial class register
+    [Migration("20250720061656_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,6 +110,12 @@ namespace Ecommerce.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Contact")
+                        .HasColumnType("text");
+
                     b.Property<string>("DealerName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -118,7 +124,10 @@ namespace Ecommerce.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Location")
+                    b.Property<string>("FirmName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GSTNumber")
                         .HasColumnType("text");
 
                     b.HasKey("DealerId");
@@ -232,6 +241,12 @@ namespace Ecommerce.Migrations
                     b.Property<bool>("Mirrors")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("RegisteredRollNumberId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RegisteredRollNumbersId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("RollNumber")
                         .IsRequired()
                         .HasColumnType("text");
@@ -282,6 +297,10 @@ namespace Ecommerce.Migrations
 
                     b.HasIndex("DealerId");
 
+                    b.HasIndex("RegisteredRollNumbersId");
+
+                    b.HasIndex("RollNumber");
+
                     b.ToTable("Warranties");
                 });
 
@@ -317,9 +336,22 @@ namespace Ecommerce.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Ecommerce.Models.RegisteredRollNumbers", null)
+                        .WithMany("Warranties")
+                        .HasForeignKey("RegisteredRollNumbersId");
+
+                    b.HasOne("Ecommerce.Models.RegisteredRollNumbers", "RegisteredRollNumber")
+                        .WithMany()
+                        .HasForeignKey("RollNumber")
+                        .HasPrincipalKey("RollNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
 
                     b.Navigation("Dealer");
+
+                    b.Navigation("RegisteredRollNumber");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Customer", b =>
@@ -328,6 +360,11 @@ namespace Ecommerce.Migrations
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Dealer", b =>
+                {
+                    b.Navigation("Warranties");
+                });
+
+            modelBuilder.Entity("Ecommerce.Models.RegisteredRollNumbers", b =>
                 {
                     b.Navigation("Warranties");
                 });

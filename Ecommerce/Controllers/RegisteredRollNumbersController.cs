@@ -43,7 +43,9 @@ namespace Ecommerce.Controllers
             }
 
             var registeredRollNumbers = await _context.RegisteredRollNumber
+                .Include(r => r.Warranties)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (registeredRollNumbers == null)
             {
                 return NotFound();
@@ -70,7 +72,7 @@ namespace Ecommerce.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> Create([Bind("Id,RollNumber,Category,RegistrationDate,Status")] RegisteredRollNumbers registeredRollNumbers)
+        public async Task<IActionResult> Create(RegisteredRollNumbers registeredRollNumbers)
         {
             if (ModelState.IsValid)
             {
@@ -193,9 +195,9 @@ namespace Ecommerce.Controllers
         {
             return new List<SelectListItem>
             {
-                new SelectListItem { Value = "Prime", Text = "Prime" },
-                new SelectListItem { Value = "Ultimate", Text = "Ultimate" },
-                new SelectListItem { Value = "Ultimate Plus", Text = "Ultimate Plus" }
+                new SelectListItem { Value = "A", Text = "Prime" },
+                new SelectListItem { Value = "B", Text = "Ultimate" },
+                new SelectListItem { Value = "C", Text = "Ultimate Plus" }
             };
         }
 

@@ -30,8 +30,8 @@ using System.Threading.Tasks;
             // GET: Warranties
             public async Task<IActionResult> Index()
             {
-                var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer);
-                return View(await myContext.ToListAsync());
+                var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer).Include(w => w.RegisteredRollNumber);
+            return View(await myContext.ToListAsync());
             }
             [Authorize]
             // GET: Warranties/Details/5
@@ -45,6 +45,7 @@ using System.Threading.Tasks;
                 var warranty = await _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .FirstOrDefaultAsync(m => m.WarrantyId == id);
                 if (warranty == null)
                 {
@@ -167,6 +168,7 @@ using System.Threading.Tasks;
                 var warranty = await _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .FirstOrDefaultAsync(m => m.WarrantyId == id);
                 if (warranty == null)
                 {
@@ -247,6 +249,7 @@ using System.Threading.Tasks;
                 IQueryable<Warranty> query = _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .Where(w => w.Status == 0); // Pending
 
                 if (role == "Dealer")
@@ -271,6 +274,7 @@ using System.Threading.Tasks;
                 IQueryable<Warranty> query = _context.Warranties
                     .Include(w => w.Customer)
                     .Include(w => w.Dealer)
+                    .Include(w => w.RegisteredRollNumber)
                     .Where(w => w.Status == 1); // Approved
 
                 if (role == "Dealer")
@@ -286,7 +290,7 @@ using System.Threading.Tasks;
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> SaveWarrantyFromDashboard(Warranty warranty, Customer customer)
+        public async Task<IActionResult> SaveWarrantyFromDashboard(Warranty warranty, Customer customer, RegisteredRollNumbers registeredRollNumbers)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = await _context.Users.FindAsync(userId);
@@ -321,6 +325,23 @@ using System.Threading.Tasks;
             warranty.WarrantyId = Guid.NewGuid();
             warranty.Status = 0;
 
+            //
+
+            var registeredRollNumber = await _context.RegisteredRollNumber
+                .FirstOrDefaultAsync(r => r.RollNumber == warranty.RollNumber);
+
+            if (registeredRollNumber != null)
+            {
+                warranty.RegisteredRollNumberId = registeredRollNumber.Id;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid roll number.";
+                return RedirectToAction("Dashboard");
+            }
+
+
+            //
             _context.Warranties.Add(warranty);
             await _context.SaveChangesAsync();
 
@@ -329,8 +350,6 @@ using System.Threading.Tasks;
             /// email part
             var adminEmail = _config["Email:AdminEmail"];
             var dealer = await _context.Dealers.FindAsync(warranty.DealerId);
-            var registeredRollNumber = await _context.RegisteredRollNumber
-                .FirstOrDefaultAsync(r => r.RollNumber == warranty.RollNumber);
 
 
 
@@ -361,6 +380,7 @@ using System.Threading.Tasks;
             IQueryable<Warranty> query = _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
                 .Where(w => w.Status == 0); // Pending
 
             if (role == "Dealer")
@@ -383,6 +403,7 @@ using System.Threading.Tasks;
             IQueryable<Warranty> query = _context.Warranties
                 .Include(w => w.Customer)
                 .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
                 .Where(w => w.Status == 1); // Approved
 
             if (role == "Dealer")
