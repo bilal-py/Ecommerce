@@ -10,13 +10,15 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Log all environment variables
-        // Diagnostic check for connection string
-        Console.WriteLine("=== CONNECTION STRING DIAGNOSTICS ===");
-        Console.WriteLine($"Direct env var access: {Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") != null}");
-        Console.WriteLine($"Config.GetConnectionString(): {builder.Configuration.GetConnectionString("DefaultConnection") != null}");
-        Console.WriteLine($"Config['ConnectionStrings:DefaultConnection']: {builder.Configuration["ConnectionStrings:DefaultConnection"] != null}");
-        Console.WriteLine("=====================================");
+
+        // Diagnostic logging
+        Console.WriteLine("===== CONFIGURATION VALUES =====");
+        Console.WriteLine($"ConnectionStrings:DefaultConnection = {builder.Configuration.GetConnectionString("DefaultConnection") ?? "NULL"}");
+        Console.WriteLine($"Email:SmtpHost = {builder.Configuration["Email:SmtpHost"] ?? "NULL"}");
+        Console.WriteLine($"ADMIN1_EMAIL = {builder.Configuration["ADMIN1_EMAIL"] ?? "NULL"}");
+        Console.WriteLine("================================");
+
+
 
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
@@ -92,60 +94,23 @@ public class Program
         app.Run();
     }
 
-
     private static string GetConnectionString(IConfiguration configuration)
     {
-        // 1. Directly access the environment variable
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            Console.WriteLine("Using connection string from ConnectionStrings__DefaultConnection env var");
-            return connectionString;
-        }
+        // Use configuration system exclusively
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        // 2. Try alternative naming patterns
-        connectionString = Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection") ??
-                          Environment.GetEnvironmentVariable("CONNECTION_STRING") ??
-                          Environment.GetEnvironmentVariable("DB_CONNECTION");
-
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            Console.WriteLine("Using connection string from alternative env var");
-            return connectionString;
-        }
-
-        // 3. Handle Railway's DATABASE_URL
-        var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-        if (!string.IsNullOrEmpty(dbUrl))
-        {
-            Console.WriteLine("Converting DATABASE_URL to connection string");
-            try
-            {
-                var uri = new Uri(dbUrl);
-                var username = uri.UserInfo.Split(':')[0];
-                var password = uri.UserInfo.Split(':')[1];
-                return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-                       $"Username={username};Password={password};" +
-                       "SSL Mode=Require;Trust Server Certificate=true";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing DATABASE_URL: {ex.Message}");
-                return dbUrl; // Fallback to raw value
-            }
-        }
-
-        // 4. Last resort: configuration system
-        connectionString = configuration.GetConnectionString("DefaultConnection");
         if (!string.IsNullOrEmpty(connectionString))
         {
             Console.WriteLine("Using connection string from configuration");
             return connectionString;
         }
 
-        Console.WriteLine("WARNING: No connection string found in any source!");
+        Console.WriteLine("WARNING: No connection string found!");
         return null;
     }
+
+
+
 
     private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
     {
