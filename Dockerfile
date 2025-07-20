@@ -1,4 +1,5 @@
 
+
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
@@ -23,38 +24,6 @@ RUN dotnet publish "./Ecommerce.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-# Add runtime environment variables support
-ARG ConnectionStrings__DefaultConnection
-ARG DATABASE_URL
-ARG ADMIN1_EMAIL
-ARG ADMIN1_USERNAME
-ARG ADMIN1_PASSWORD
-ARG ADMIN2_EMAIL
-ARG ADMIN2_USERNAME
-ARG ADMIN2_PASSWORD
-ARG Email__SmtpHost
-ARG Email__Port
-ARG Email__Username
-ARG Email__Password
-ARG Email__From
-ARG Email__AdminEmail
-
-ENV ConnectionStrings__DefaultConnection=$ConnectionStrings__DefaultConnection \
-    DATABASE_URL=$DATABASE_URL \
-    ADMIN1_EMAIL=$ADMIN1_EMAIL \
-    ADMIN1_USERNAME=$ADMIN1_USERNAME \
-    ADMIN1_PASSWORD=$ADMIN1_PASSWORD \
-    ADMIN2_EMAIL=$ADMIN2_EMAIL \
-    ADMIN2_USERNAME=$ADMIN2_USERNAME \
-    ADMIN2_PASSWORD=$ADMIN2_PASSWORD \
-    Email__SmtpHost=$Email__SmtpHost \
-    Email__Port=$Email__Port \
-    Email__Username=$Email__Username \
-    Email__Password=$Email__Password \
-    Email__From=$Email__From \
-    Email__AdminEmail=$Email__AdminEmail
-
 ENTRYPOINT ["dotnet", "Ecommerce.dll"]
 
 

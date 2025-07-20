@@ -10,12 +10,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Log all environment variables for debugging
-        Console.WriteLine("Environment variables:");
+        // Log all environment variables
+        Console.WriteLine("===== ALL ENVIRONMENT VARIABLES =====");
         foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
         {
-            Console.WriteLine($"  {env.Key} = {env.Value}");
+            Console.WriteLine($"{env.Key} = {env.Value}");
         }
+        Console.WriteLine("=====================================");
 
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
@@ -93,7 +94,7 @@ public class Program
 
     private static string GetConnectionString(IConfiguration configuration)
     {
-        // Method 1: Try standard configuration first
+        // 1. Check standard configuration sources
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         if (!string.IsNullOrEmpty(connectionString))
         {
@@ -101,7 +102,15 @@ public class Program
             return connectionString;
         }
 
-        // Method 2: Handle Railway's DATABASE_URL format
+        // 2. Check direct environment variable
+        connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Using connection string from ConnectionStrings__DefaultConnection env var");
+            return connectionString;
+        }
+
+        // 3. Handle Railway's DATABASE_URL
         var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
         if (!string.IsNullOrEmpty(dbUrl))
         {
@@ -122,18 +131,20 @@ public class Program
             }
         }
 
-        // Method 3: Try environment variable with double underscore
-        connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        // 4. Check other potential sources
+        connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") ??
+                           Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+                           Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
         if (!string.IsNullOrEmpty(connectionString))
         {
-            Console.WriteLine("Using connection string from ConnectionStrings__DefaultConnection env var");
+            Console.WriteLine("Using connection string from alternative env var");
             return connectionString;
         }
 
         Console.WriteLine("WARNING: No connection string found in any source!");
         return null;
     }
-
     private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
     {
         try
