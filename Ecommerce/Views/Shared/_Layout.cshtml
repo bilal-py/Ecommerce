@@ -1,4 +1,45 @@
 ﻿<!DOCTYPE html>
+<style>
+    header {
+        background: #212529; /* dark grey to white */
+    }
+
+    .logo-border {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid white; /* White border */
+        border-radius: 25px; /* Rounded corners */
+        color: white; /* Text color */
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        .logo-border:hover {
+            background-color: white; /* On hover */
+            color: #000 !important; /* Dark text */
+        }
+
+    .logo-border {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid white;
+        border-radius: 25px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        .logo-border:hover {
+            background-color: white;
+            color: #000 !important;
+        }
+
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
 <html lang="en">
 
 <head>
@@ -38,75 +79,62 @@
     * License: https://bootstrapmade.com/license/
     ======================================================== -->
 </head>
-<style>
-    header {
-        background: #212529; /* dark grey to white */
-    }
-
-    .logo-border {
-        display: inline-block;
-        padding: 10px 20px;
-        border: 2px solid white; /* White border */
-        border-radius: 25px; /* Rounded corners */
-        color: white; /* Text color */
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-        .logo-border:hover {
-            background-color: white; /* On hover */
-            color: #000 !important; /* Dark text */
-        }
-</style>
 <body>
     @*-------------------------------------Header----------------------------------------*@
-    <header id="header" class="fixed-top" style="background:  #212529;">
-        <div class="container d-flex align-items-center justify-content-between">
-            <h1 class="logo">
-                <a asp-controller="Home" asp-action="Index" class="logo-border">MOTOPROTEKT</a>
-            </h1>
-            <nav id="navbar" class="navbar">
-                <ul>
-                    @*                    <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
-*@
-                    <li><a class="nav-link scrollto active" asp-controller="Home" asp-action="Index">Home</a></li>
+    <header id="header" class="fixed-top bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand logo-border" style="font-size:25px;" asp-controller="Home" asp-action="Index">MOTOPROTEKT</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        if (User.IsInRole("Admin"))
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        @if (User.Identity.IsAuthenticated)
                         {
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="RegisteredRollNumbers" asp-action="Create">Register Roll Number</a>
+                                </li>
+                            }
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="RegisteredRollNumbers" asp-action="Create">Register Roll Number</a>
+                                <a class="nav-link" asp-controller="Warranties" asp-action="Dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="UserProfile">Show Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
                             </li>
                         }
-
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Warranties" asp-action="Dashboard">Dashboard</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="UserProfile">Show Profile</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link " asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Dealer Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="CreateAccount">Create Account</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
-        </div>
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Dealer Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="CreateAccount">Create Account</a>
+                            </li>
+                             <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="AboutUs">About us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#contact">Contact</a> <!-- FIXED -->
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </header>
+
 
 
     <
@@ -117,8 +145,8 @@
 
     </main><!-- End #main -->
     <!-- ======= Footer ======= -->
-    <footer id="footer" style="background:  #212529;">
-
+  <footer id="footer" style="background:  #212529;" **id="contact" **> 
+ @*    <footer id="contact" style="background:  #212529;"> *@
         <div class="footer-top">
             <div class="container">
                 <div class="row">
@@ -128,7 +156,8 @@
                         <p>
                             A marketplace which helps buyers find their<br>
                             desired kicks and the sellers to find the buyers<br>
-                            <strong>Contact Information</strong>
+                        <a href="#contact"><i class="bi bi-envelope navicon"></i> <strong>Contact Information</strong></a>
+                           
                             contact@motoprotekt.de<br>
                             support@motoprotekt.de<br>
                             Auf dem Hilf 17, Ruhr, Germany
