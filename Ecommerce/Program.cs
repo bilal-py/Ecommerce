@@ -2,7 +2,6 @@
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
 
 public class Program
 {
@@ -10,72 +9,56 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // This single line sets up configuration to read from:
+        // 1. appsettings.json
+        // 2. appsettings.Production.json (since ASPNETCORE_ENVIRONMENT is 'Production' in your Dockerfile)
+        // 3. Environment Variables (which will override the files)
 
-        // Diagnostic logging
-        Console.WriteLine("===== CONFIGURATION VALUES =====");
-        Console.WriteLine($"ConnectionStrings:DefaultConnection = {builder.Configuration.GetConnectionString("DefaultConnection") ?? "NULL"}");
-        Console.WriteLine($"Email:SmtpHost = {builder.Configuration["Email:SmtpHost"] ?? "NULL"}");
-        Console.WriteLine($"ADMIN1_EMAIL = {builder.Configuration["ADMIN1_EMAIL"] ?? "NULL"}");
-        Console.WriteLine("================================");
+        // --- SERVICE CONFIGURATION ---
 
+        // 1. Get the connection string directly from the configuration system.
+        // It will automatically find and use the "ConnectionStrings__DefaultConnection"
+        // variable from your Railway settings.
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+        // 2. Add a "fail-fast" check. If the connection string isn't found, the app will
+        // stop immediately with a clear error message.
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("CRITICAL ERROR: Database connection string 'DefaultConnection' was not found. Please ensure it is set correctly in Railway's environment variables.");
+        }
 
+        // 3. Configure your services.
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        // Get connection string
-        var connectionString = GetConnectionString(builder.Configuration);
-
-        Console.WriteLine($"Connection string found: {!string.IsNullOrEmpty(connectionString)}");
-        Console.WriteLine($"Connection string length: {connectionString?.Length ?? 0}");
-
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            Console.WriteLine("ERROR: No connection string found!");
-            throw new InvalidOperationException("Database connection string is required but not found.");
-        }
-
+        // 4. Add the DbContext using the connection string we just retrieved.
         builder.Services.AddDbContext<MyContext>(options =>
             options.UseNpgsql(connectionString));
 
-        // Cookie authentication configuration
+        // 5. Configure cookie authentication.
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
         {
             options.LoginPath = "/Account/Login";
             options.LogoutPath = "/Account/Login";
             options.AccessDeniedPath = "/Account/AccessDenied";
-            options.Cookie.Name = "Home";
+            options.Cookie.Name = "YourAppCookieName"; // It's good practice to give this a unique name
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ?
-                CookieSecurePolicy.None : CookieSecurePolicy.Always;
+            // This logic is correct: secure cookie in production, non-secure in development
+            options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+                ? CookieSecurePolicy.None
+                : CookieSecurePolicy.Always;
         });
+
+        // --- APPLICATION AND PIPELINE CONFIGURATION ---
 
         var app = builder.Build();
 
-        // Database migration and seeding
-        try
-        {
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<MyContext>();
-                Console.WriteLine("Attempting database migration...");
+        // This is a good place to apply migrations and seed data.
+        InitializeDatabase(app);
 
-                // Apply any pending migrations
-                dbContext.Database.Migrate();
-                Console.WriteLine("Database migration completed successfully.");
-
-                // Seed data after migration
-                SeedUsers(dbContext, app.Configuration);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Database migration failed: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            throw;
-        }
-
+        // Configure the HTTP request pipeline (middleware).
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
@@ -84,7 +67,7 @@ public class Program
 
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseAuthentication();
+        app.UseAuthentication(); // Important: comes before UseAuthorization
         app.UseAuthorization();
 
         app.MapControllerRoute(
@@ -94,340 +77,95 @@ public class Program
         app.Run();
     }
 
-    private static string GetConnectionString(IConfiguration configuration)
+    // Helper method to keep the Main method clean. This handles database setup.
+    private static void InitializeDatabase(IApplicationBuilder app)
     {
-        // Use configuration system exclusively
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-        if (!string.IsNullOrEmpty(connectionString))
+        // 'CreateScope' is the correct way to get services like DbContext during app startup.
+        using (var scope = app.ApplicationServices.CreateScope())
         {
-            Console.WriteLine("Using connection string from configuration");
-            return connectionString;
-        }
-
-        Console.WriteLine("WARNING: No connection string found!");
-        return null;
-    }
-
-
-
-
-    private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
-    {
-        try
-        {
-            Console.WriteLine("Checking if users need to be seeded...");
-
-            if (!dbContext.Users.Any())
+            var services = scope.ServiceProvider;
+            try
             {
-                Console.WriteLine("No users found, seeding admin users...");
+                var dbContext = services.GetRequiredService<MyContext>();
+                Console.WriteLine("Attempting to apply database migrations...");
+                // This applies any pending migrations to the database.
+                dbContext.Database.Migrate();
+                Console.WriteLine("Database migrations applied successfully.");
 
-                // Pass configuration to GetConfigValue
-                var admin1Email = GetConfigValue(configuration, "ADMIN1_EMAIL");
-                var admin1Username = GetConfigValue(configuration, "ADMIN1_USERNAME");
-                var admin1Pass = GetConfigValue(configuration, "ADMIN1_PASSWORD");
-                var admin2Email = GetConfigValue(configuration, "ADMIN2_EMAIL");
-                var admin2Username = GetConfigValue(configuration, "ADMIN2_USERNAME");
-                var admin2Pass = GetConfigValue(configuration, "ADMIN2_PASSWORD");
-
-                // Log retrieved values
-                Console.WriteLine($"Admin1 Email: {admin1Email ?? "NULL"}");
-                Console.WriteLine($"Admin1 Username: {admin1Username ?? "NULL"}");
-                Console.WriteLine($"Admin2 Email: {admin2Email ?? "NULL"}");
-                Console.WriteLine($"Admin2 Username: {admin2Username ?? "NULL"}");
-
-                // Only seed if we have at least one complete admin user
-                if (!string.IsNullOrEmpty(admin1Email) &&
-                    !string.IsNullOrEmpty(admin1Username) &&
-                    !string.IsNullOrEmpty(admin1Pass))
-                {
-                    var users = new List<User>
-                    {
-                        new User
-                        {
-                            email = admin1Email,
-                            userName = admin1Username,
-                            password = admin1Pass,
-                            Role = "Admin",
-                            Age = 22
-                        }
-                    };
-
-                    // Add second admin if all details are available
-                    if (!string.IsNullOrEmpty(admin2Email) &&
-                        !string.IsNullOrEmpty(admin2Username) &&
-                        !string.IsNullOrEmpty(admin2Pass))
-                    {
-                        users.Add(new User
-                        {
-                            email = admin2Email,
-                            userName = admin2Username,
-                            password = admin2Pass,
-                            Role = "Admin",
-                            Age = 18
-                        });
-                    }
-
-                    dbContext.Users.AddRange(users);
-                    dbContext.SaveChanges();
-                    Console.WriteLine($"Successfully seeded {users.Count} admin user(s).");
-                }
-                else
-                {
-                    Console.WriteLine("WARNING: No admin users seeded due to missing environment variables.");
-                }
+                // Now, seed the initial user data.
+                SeedAdminUsers(dbContext, services.GetRequiredService<IConfiguration>());
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("Users already exist, skipping seeding.");
+                // Using a proper logger is better, but for now, this shows the error clearly.
+                Console.WriteLine($"FATAL: An error occurred during database initialization: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                // Re-throwing the exception will stop the application from starting in a broken state.
+                throw;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during user seeding: {ex.Message}");
-            // Don't throw exception here, let the application continue
         }
     }
 
-    private static string GetConfigValue(IConfiguration configuration, string key)
+    // Simplified seeding method.
+    private static void SeedAdminUsers(MyContext dbContext, IConfiguration configuration)
     {
-        // Environment variables take priority
-        var value = Environment.GetEnvironmentVariable(key);
-        if (!string.IsNullOrEmpty(value))
+        Console.WriteLine("Checking if admin users need to be seeded...");
+
+        if (dbContext.Users.Any())
         {
-            Console.WriteLine($"Found {key} in environment variables");
-            return value;
+            Console.WriteLine("Database already contains users. Skipping seed process.");
+            return;
         }
 
-        // Fallback to configuration
-        value = configuration[key];
-        if (!string.IsNullOrEmpty(value))
+        Console.WriteLine("No users found. Attempting to seed admin accounts...");
+
+        // Read admin details DIRECTLY from configuration.
+        // It automatically checks environment variables.
+        var admin1Email = configuration["ADMIN1_EMAIL"];
+        var admin1Username = configuration["ADMIN1_USERNAME"];
+        var admin1Pass = configuration["ADMIN1_PASSWORD"];
+
+        var admin2Email = configuration["ADMIN2_EMAIL"];
+        var admin2Username = configuration["ADMIN2_USERNAME"];
+        var admin2Pass = configuration["ADMIN2_PASSWORD"];
+
+        var usersToSeed = new List<User>();
+
+        if (!string.IsNullOrEmpty(admin1Email) && !string.IsNullOrEmpty(admin1Username) && !string.IsNullOrEmpty(admin1Pass))
         {
-            Console.WriteLine($"Found {key} in configuration");
-            return value;
+            usersToSeed.Add(new User
+            {
+                email = admin1Email,
+                userName = admin1Username,
+                password = admin1Pass, // Note: You should be HASHING passwords, not storing them in plain text!
+                Role = "Admin",
+                Age = 22
+            });
+            Console.WriteLine($"Found configuration for Admin1: {admin1Username}");
         }
 
-        Console.WriteLine($"WARNING: Configuration value for {key} not found!");
-        return null;
+        if (!string.IsNullOrEmpty(admin2Email) && !string.IsNullOrEmpty(admin2Username) && !string.IsNullOrEmpty(admin2Pass))
+        {
+            usersToSeed.Add(new User
+            {
+                email = admin2Email,
+                userName = admin2Username,
+                password = admin2Pass, // Note: You should be HASHING passwords!
+                Role = "Admin",
+                Age = 18
+            });
+            Console.WriteLine($"Found configuration for Admin2: {admin2Username}");
+        }
+
+        if (usersToSeed.Any())
+        {
+            dbContext.Users.AddRange(usersToSeed);
+            dbContext.SaveChanges();
+            Console.WriteLine($"SUCCESS: Seeded {usersToSeed.Count} admin user(s) to the database.");
+        }
+        else
+        {
+            Console.WriteLine("WARNING: Could not seed any admin users. Check your ADMIN# environment variables in Railway.");
+        }
     }
 }
-
-
-
-
-
-
-// using Ecommerce.Models;
-// using Ecommerce.Services;
-// using Microsoft.AspNetCore.Authentication.Cookies;
-// using Microsoft.EntityFrameworkCore;
-// using System.Collections;
-
-// public class Program
-// {
-//     public static void Main(string[] args)
-//     {
-//         var builder = WebApplication.CreateBuilder(args);
-
-//         builder.Services.AddTransient<IEmailService, EmailService>();
-//         builder.Services.AddControllersWithViews();
-//         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
-
-//         // Try multiple ways to get the connection string
-//         var connectionString = GetConnectionString(builder.Configuration);
-
-//         Console.WriteLine($"Connection string found: {!string.IsNullOrEmpty(connectionString)}");
-//         Console.WriteLine($"Connection string length: {connectionString?.Length ?? 0}");
-
-//         if (string.IsNullOrEmpty(connectionString))
-//         {
-//             Console.WriteLine("ERROR: No connection string found!");
-//             Console.WriteLine("Available environment variables:");
-//             foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
-//             {
-//                 if (env.Key.ToString().Contains("Connection") || env.Key.ToString().Contains("DATABASE"))
-//                 {
-//                     Console.WriteLine($"  {env.Key}: {env.Value}");
-//                 }
-//             }
-//             throw new InvalidOperationException("Database connection string is required but not found.");
-//         }
-
-//         builder.Services.AddDbContext<MyContext>(options =>
-//             options.UseNpgsql(connectionString));
-
-//         // Cookie authentication configuration
-//         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-//         {
-//             options.LoginPath = "/Account/Login";
-//             options.LogoutPath = "/Account/Login";
-//             options.AccessDeniedPath = "/Account/AccessDenied";
-//             options.Cookie.Name = "Home";
-//             options.Cookie.HttpOnly = true;
-//             options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ?
-//                 CookieSecurePolicy.None : CookieSecurePolicy.Always;
-//         });
-
-//         var app = builder.Build();
-
-//         // Database migration and seeding
-//         try
-//         {
-//             using (var scope = app.Services.CreateScope())
-//             {
-//                 var dbContext = scope.ServiceProvider.GetRequiredService<MyContext>();
-//                 Console.WriteLine("Attempting database migration...");
-
-//                 // Apply any pending migrations
-//                 dbContext.Database.Migrate();
-//                 Console.WriteLine("Database migration completed successfully.");
-
-//                 // Seed data after migration
-//                 SeedUsers(dbContext, app.Configuration);
-//             }
-//         }
-//         catch (Exception ex)
-//         {
-//             Console.WriteLine($"Database migration failed: {ex.Message}");
-//             Console.WriteLine($"Stack trace: {ex.StackTrace}");
-//             throw;
-//         }
-
-//         if (!app.Environment.IsDevelopment())
-//         {
-//             app.UseExceptionHandler("/Home/Error");
-//             app.UseHsts();
-//         }
-
-//         app.UseStaticFiles();
-//         app.UseRouting();
-//         app.UseAuthentication();
-//         app.UseAuthorization();
-
-//         app.MapControllerRoute(
-//             name: "default",
-//             pattern: "{controller=Home}/{action=Index}/{id?}");
-
-//         app.Run();
-//     }
-
-//     private static string GetConnectionString(IConfiguration configuration)
-//     {
-//         // Simplified approach using configuration system
-//         var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-//         if (!string.IsNullOrEmpty(connectionString))
-//             return connectionString;
-
-//         // Handle Railway's DATABASE_URL format
-//         var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-//         if (string.IsNullOrEmpty(dbUrl))
-//             return null;
-
-//         try
-//         {
-//             var uri = new Uri(dbUrl);
-//             var username = uri.UserInfo.Split(':')[0];
-//             var password = uri.UserInfo.Split(':')[1];
-//             return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-//                    $"Username={username};Password={password};" +
-//                    "SSL Mode=Require;Trust Server Certificate=true";
-//         }
-//         catch
-//         {
-//             return dbUrl; // Fallback to raw value
-//         }
-//     }
-
-//     private static void SeedUsers(MyContext dbContext, IConfiguration configuration)
-//     {
-//         try
-//         {
-//             Console.WriteLine("Checking if users need to be seeded...");
-
-//             if (!dbContext.Users.Any())
-//             {
-//                 Console.WriteLine("No users found, seeding admin users...");
-
-//                 var admin1Email = GetConfigValue(configuration, "ADMIN1_EMAIL");
-//                 var admin1Username = GetConfigValue(configuration, "ADMIN1_USERNAME");
-//                 var admin1Pass = GetConfigValue(configuration, "ADMIN1_PASSWORD");
-//                 var admin2Email = GetConfigValue(configuration, "ADMIN2_EMAIL");
-//                 var admin2Username = GetConfigValue(configuration, "ADMIN2_USERNAME");
-//                 var admin2Pass = GetConfigValue(configuration, "ADMIN2_PASSWORD");
-
-//                 // Validate that all required environment variables are present
-//                 var requiredVars = new[]
-//                 {
-//                     (admin1Email, "ADMIN1_EMAIL"),
-//                     (admin1Username, "ADMIN1_USERNAME"),
-//                     (admin1Pass, "ADMIN1_PASSWORD"),
-//                     (admin2Email, "ADMIN2_EMAIL"),
-//                     (admin2Username, "ADMIN2_USERNAME"),
-//                     (admin2Pass, "ADMIN2_PASSWORD")
-//                 };
-
-//                 foreach (var (value, name) in requiredVars)
-//                 {
-//                     if (string.IsNullOrEmpty(value))
-//                     {
-//                         Console.WriteLine($"WARNING: Environment variable {name} is not set.");
-//                         // Don't throw exception, just log warning for now
-//                     }
-//                 }
-
-//                 // Only seed if we have at least one complete admin user
-//                 if (!string.IsNullOrEmpty(admin1Email) && !string.IsNullOrEmpty(admin1Username) && !string.IsNullOrEmpty(admin1Pass))
-//                 {
-//                     var users = new List<User>
-//                     {
-//                         new User
-//                         {
-//                             email = admin1Email,
-//                             userName = admin1Username,
-//                             password = admin1Pass,
-//                             Role = "Admin",
-//                             Age = 22
-//                         }
-//                     };
-
-//                     // Add second admin if all details are available
-//                     if (!string.IsNullOrEmpty(admin2Email) && !string.IsNullOrEmpty(admin2Username) && !string.IsNullOrEmpty(admin2Pass))
-//                     {
-//                         users.Add(new User
-//                         {
-//                             email = admin2Email,
-//                             userName = admin2Username,
-//                             password = admin2Pass,
-//                             Role = "Admin",
-//                             Age = 18
-//                         });
-//                     }
-
-//                     dbContext.Users.AddRange(users);
-//                     dbContext.SaveChanges();
-//                     Console.WriteLine($"Successfully seeded {users.Count} admin user(s).");
-//                 }
-//                 else
-//                 {
-//                     Console.WriteLine("WARNING: No admin users seeded due to missing environment variables.");
-//                 }
-//             }
-//             else
-//             {
-//                 Console.WriteLine("Users already exist, skipping seeding.");
-//             }
-//         }
-//         catch (Exception ex)
-//         {
-//             Console.WriteLine($"Error during user seeding: {ex.Message}");
-//             // Don't throw exception here, let the application continue
-//         }
-//     }
-
-//     private static string GetConfigValue(IConfiguration configuration, string key)
-//     {
-//         // Correct order: environment variables first, then configuration
-//         return Environment.GetEnvironmentVariable(key) ?? configuration[key];
-//     }
-// }
