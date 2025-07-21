@@ -11,64 +11,47 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure logging first
+        // Logging
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
         builder.Logging.SetMinimumLevel(LogLevel.Information);
 
         Console.WriteLine("=== APPLICATION STARTUP ===");
         Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-        Console.WriteLine($"Application Name: {builder.Environment.ApplicationName}");
-        Console.WriteLine($"ENV: {Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")} ");
-        Console.WriteLine($"ENV: {Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")} ");
 
+        // Use env variable in production, else from appsettings.json
+        string connectionString;
 
-        // --- SERVICE CONFIGURATION ---
-
-        // Get the connection string - try multiple methods for Railway compatibility
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                              ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
-                              ?? builder.Configuration["DATABASE_CONNECTION_STRING"]
-                              ?? Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
-
-        if (string.IsNullOrEmpty(connectionString))
+        if (builder.Environment.IsDevelopment())
         {
-            Console.WriteLine("ERROR: Database connection string not found.");
-            Console.WriteLine("Tried the following configuration keys:");
-            Console.WriteLine("- ConnectionStrings:DefaultConnection");
-            Console.WriteLine("- ConnectionStrings__DefaultConnection");
-            Console.WriteLine("- DATABASE_URL");
-            Console.WriteLine();
-            Console.WriteLine("Available configuration keys:");
-            foreach (var config in builder.Configuration.AsEnumerable())
-            {
-                Console.WriteLine($"  {config.Key} = {(config.Key.ToLower().Contains("password") ? "***" : config.Value)}");
-            }
-            throw new InvalidOperationException("Database connection string not found. Please ensure it is set correctly in Railway's environment variables.");
+            connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        }
+        else
+        {
+            connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+        }
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            Console.WriteLine("❌ ERROR: Database connection string not found.");
+            throw new InvalidOperationException("Missing database connection string.");
         }
 
         Console.WriteLine("✓ Database connection string found");
-        // Log connection string without sensitive data
-        var sanitizedConnectionString = SanitizeConnectionString(connectionString);
-        Console.WriteLine($"Connection: {sanitizedConnectionString}");
+        Console.WriteLine($"Connection: {SanitizeConnectionString(connectionString)}");
 
-        // Configure services
+        // Add services
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        // Add DbContext with retry policy for Railway
         builder.Services.AddDbContext<MyContext>(options =>
         {
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
-                npgsqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(10),
-                    errorCodesToAdd: null);
+                npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
             });
 
-            // Enable sensitive data logging only in development
             if (builder.Environment.IsDevelopment())
             {
                 options.EnableSensitiveDataLogging();
@@ -76,7 +59,6 @@ public class Program
             }
         });
 
-        // Configure authentication
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
@@ -94,31 +76,19 @@ public class Program
 
         var app = builder.Build();
 
-        Console.WriteLine("✓ Services configured successfully");
-
-        // Initialize database with better error handling
         try
         {
             InitializeDatabase(app);
-            Console.WriteLine("✓ Database initialization completed");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-
-            // Don't throw in production, let the app start without seeded data
+            Console.WriteLine($"❌ DB init failed: {ex.Message}");
             if (app.Environment.IsDevelopment())
-            {
                 throw;
-            }
-            else
-            {
-                Console.WriteLine("⚠️  Application will continue without database seeding in production");
-            }
+            Console.WriteLine("⚠️ App continues without DB seeding.");
         }
 
-        // Configure middleware pipeline
+        // Middleware
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
@@ -129,11 +99,8 @@ public class Program
             app.UseDeveloperExceptionPage();
         }
 
-        // Set up port for Railway
         var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
         app.Urls.Add($"http://0.0.0.0:{port}");
-
-        Console.WriteLine($"✓ Application configured to listen on port {port}");
 
         app.UseStaticFiles();
         app.UseRouting();
@@ -143,9 +110,6 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        Console.WriteLine("✓ Middleware pipeline configured");
-        Console.WriteLine("=== STARTING APPLICATION ===");
 
         app.Run();
     }
