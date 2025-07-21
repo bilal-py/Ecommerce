@@ -238,9 +238,14 @@ using System.Threading.Tasks;
             {
                 return PartialView("_WarrantyRegistration");
             }
-
-            // GET: /Dashboard/WarrantyPending
-            [Authorize]
+        // GET: /Dashboard/ExpiredWarranty
+        [Authorize]
+        public IActionResult ExpiredWarranty()
+            {
+                return PartialView("_ExpiredWarranty");
+            }
+        // GET: /Dashboard/WarrantyPending
+        [Authorize]
             public async Task<IActionResult> WarrantyPending(string dealerId)
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
