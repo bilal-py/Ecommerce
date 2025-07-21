@@ -27,23 +27,27 @@
 
 </head>
 <body>
-
+    <Div style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
     <section data-bs-version="5.1" class="header4 cid-uQFAjdTFkD mbr-fullscreen" id="header4-m"
-             style="background: url('@Url.Content("~/Images/Img0.jpg")') no-repeat center center / cover;">
-        >
+             style="background: url('@Url.Content("~/Images/background.png")') no-repeat center center / cover;">
+        <!-- Logo Positioned Absolutely -->
+        <div class="container">
+            <!-- Centered Logo -->
+            <img src="@Url.Content("~/Images/logo.png")"
+                 alt="MOTOPROTEKT Logo"
+                 style="max-width: 700px; width: 100%;"
+                 class="mb-4">
 
-
+            <!-- Large Headline -->
+            <h1 class="text-white display-3 fw-4">Welcome to MOTOPROTEKT</h1>
+            <p class="text-white fs-4">High-quality PPF protection</p>
+        </div>
     </section>
 
-    <section data-bs-version="5.1" class="gallery5 mbr-gallery cid-uQFACkU2z2" id="gallery5-n">
-
-
-
-
-
+    <section data-bs-version="5.1" class="gallery5 mbr-gallery cid-uQFACkU2z2" id="gallery5-n" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
         <div class="container" id="Category">
             <div class="mbr-section-head">
-                <h4 class="mbr-section-title mbr-fonts-style align-center m-0 display-2"><strong>Shop By Category</strong></h4>
+                <h4 class="mbr-section-title mbr-fonts-style align-center m-0 display-2 text-white">Shop By Category</h4>
                 <h4 class="mbr-section-subtitle mbr-fonts-style align-center mb-0 mt-2 display-5"></h4>
             </div>
             <div class="row mbr-gallery mt-4">
@@ -127,15 +131,12 @@
             </div>
         </div>
     </section>
-
-    <section data-bs-version="5.1" class="slider3 mbr-embla cid-uQFAJvXKZ3" id="slider3-p">
-
-
-
-
+    <section data-bs-version="5.1" class=" container slider3 mbr-embla cid-uQFAJvXKZ3" id="slider3-p" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+       
         <div class="position-relative text-center">
             <div class="mbr-section-head">
-                <h4 class="mbr-section-title mbr-fonts-style align-center m-0 display-2"><strong>Trending Products</strong></h4>
+                <h4 class="mbr-section-title mbr-fonts-style align-center m-0 display-2 text-white">Trending Products</h4>
+                <h4 class="mbr-section-subtitle mbr-fonts-style align-center mb-0 mt-2 display-5"></h4>
             </div>
             <div class="embla" data-skip-snaps="true" data-align="center" data-contain-scroll="trimSnaps" data-auto-play-interval="5" data-draggable="true">
                 <div class="embla__viewport container-fluid">
@@ -290,6 +291,7 @@
         </div>
     </section>
    
+</div>  
     <script src="~/assets/MobiAssest/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/assets/MobiAssest/smoothscroll/smooth-scroll.js"></script>
     <script src="~/assets/MobiAssest/ytplayer/index.js"></script>
