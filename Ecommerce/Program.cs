@@ -22,13 +22,26 @@ public class Program
 
         // --- SERVICE CONFIGURATION ---
 
-        // Get the connection string
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        // Get the connection string - try multiple methods for Railway compatibility
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                              ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
+                              ?? builder.Configuration["DATABASE_CONNECTION_STRING"]
+                              ?? Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 
         if (string.IsNullOrEmpty(connectionString))
         {
-            Console.WriteLine("ERROR: Database connection string 'DefaultConnection' was not found.");
-            throw new InvalidOperationException("Database connection string 'DefaultConnection' was not found. Please ensure it is set correctly in Railway's environment variables.");
+            Console.WriteLine("ERROR: Database connection string not found.");
+            Console.WriteLine("Tried the following configuration keys:");
+            Console.WriteLine("- ConnectionStrings:DefaultConnection");
+            Console.WriteLine("- ConnectionStrings__DefaultConnection");
+            Console.WriteLine("- DATABASE_URL");
+            Console.WriteLine();
+            Console.WriteLine("Available configuration keys:");
+            foreach (var config in builder.Configuration.AsEnumerable())
+            {
+                Console.WriteLine($"  {config.Key} = {(config.Key.ToLower().Contains("password") ? "***" : config.Value)}");
+            }
+            throw new InvalidOperationException("Database connection string not found. Please ensure it is set correctly in Railway's environment variables.");
         }
 
         Console.WriteLine("✓ Database connection string found");
