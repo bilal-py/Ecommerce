@@ -7,6 +7,15 @@ public class Program
 {
     public static void Main(string[] args)
     {
+
+        // TEMPORARY DEBUGGING: Add this block to see all variables
+        Console.WriteLine("---- DUMPING ALL ENVIRONMENT VARIABLES ----");
+        foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
+        {
+            Console.WriteLine($"{env.Key} = {env.Value}");
+        }
+        Console.WriteLine("------------------------------------------");
+
         var builder = WebApplication.CreateBuilder(args);
 
         // This single line sets up configuration to read from:
