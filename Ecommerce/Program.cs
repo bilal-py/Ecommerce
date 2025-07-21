@@ -2,143 +2,206 @@
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 public class Program
 {
     public static void Main(string[] args)
     {
-
-        // TEMPORARY DEBUGGING: Add this block to see all variables
-        Console.WriteLine("---- DUMPING ALL ENVIRONMENT VARIABLES ----");
-        foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
-        {
-            Console.WriteLine($"{env.Key} = {env.Value}");
-        }
-        Console.WriteLine("------------------------------------------");
-
         var builder = WebApplication.CreateBuilder(args);
 
-        // This single line sets up configuration to read from:
-        // 1. appsettings.json
-        // 2. appsettings.Production.json (since ASPNETCORE_ENVIRONMENT is 'Production' in your Dockerfile)
-        // 3. Environment Variables (which will override the files)
+        // Configure logging first
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+        Console.WriteLine("=== APPLICATION STARTUP ===");
+        Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+        Console.WriteLine($"Application Name: {builder.Environment.ApplicationName}");
 
         // --- SERVICE CONFIGURATION ---
 
-        // 1. Get the connection string directly from the configuration system.
-        // It will automatically find and use the "ConnectionStrings__DefaultConnection"
-        // variable from your Railway settings.
+        // Get the connection string
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-        // 2. Add a "fail-fast" check. If the connection string isn't found, the app will
-        // stop immediately with a clear error message.
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("CRITICAL ERROR: Database connection string 'DefaultConnection' was not found. Please ensure it is set correctly in Railway's environment variables.");
+            Console.WriteLine("ERROR: Database connection string 'DefaultConnection' was not found.");
+            throw new InvalidOperationException("Database connection string 'DefaultConnection' was not found. Please ensure it is set correctly in Railway's environment variables.");
         }
 
-        // 3. Configure your services.
+        Console.WriteLine("✓ Database connection string found");
+        // Log connection string without sensitive data
+        var sanitizedConnectionString = SanitizeConnectionString(connectionString);
+        Console.WriteLine($"Connection: {sanitizedConnectionString}");
+
+        // Configure services
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        // 4. Add the DbContext using the connection string we just retrieved.
+        // Add DbContext with retry policy for Railway
         builder.Services.AddDbContext<MyContext>(options =>
-            options.UseNpgsql(connectionString));
-
-        // 5. Configure cookie authentication.
-        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
         {
-            options.LoginPath = "/Account/Login";
-            options.LogoutPath = "/Account/Login";
-            options.AccessDeniedPath = "/Account/AccessDenied";
-            options.Cookie.Name = "YourAppCookieName"; // It's good practice to give this a unique name
-            options.Cookie.HttpOnly = true;
-            // This logic is correct: secure cookie in production, non-secure in development
-            options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-                ? CookieSecurePolicy.None
-                : CookieSecurePolicy.Always;
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                    errorCodesToAdd: null);
+            });
+
+            // Enable sensitive data logging only in development
+            if (builder.Environment.IsDevelopment())
+            {
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            }
         });
 
-        // --- APPLICATION AND PIPELINE CONFIGURATION ---
+        // Configure authentication
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.Cookie.Name = "EcommerceCookie";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+                    ? CookieSecurePolicy.None
+                    : CookieSecurePolicy.Always;
+                options.ExpireTimeSpan = TimeSpan.FromHours(24);
+                options.SlidingExpiration = true;
+            });
 
         var app = builder.Build();
 
-        // This is a good place to apply migrations and seed data.
-        InitializeDatabase(app);
+        Console.WriteLine("✓ Services configured successfully");
 
-        // Configure the HTTP request pipeline (middleware).
+        // Initialize database with better error handling
+        try
+        {
+            InitializeDatabase(app);
+            Console.WriteLine("✓ Database initialization completed");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+            // Don't throw in production, let the app start without seeded data
+            if (app.Environment.IsDevelopment())
+            {
+                throw;
+            }
+            else
+            {
+                Console.WriteLine("⚠️  Application will continue without database seeding in production");
+            }
+        }
+
+        // Configure middleware pipeline
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
+        else
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        // Set up port for Railway
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+        app.Urls.Add($"http://0.0.0.0:{port}");
+
+        Console.WriteLine($"✓ Application configured to listen on port {port}");
 
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseAuthentication(); // Important: comes before UseAuthorization
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
+        Console.WriteLine("✓ Middleware pipeline configured");
+        Console.WriteLine("=== STARTING APPLICATION ===");
+
         app.Run();
     }
 
-    // Helper method to keep the Main method clean. This handles database setup.
     private static void InitializeDatabase(IApplicationBuilder app)
     {
-        // 'CreateScope' is the correct way to get services like DbContext during app startup.
-        using (var scope = app.ApplicationServices.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            try
-            {
-                var dbContext = services.GetRequiredService<MyContext>();
-                Console.WriteLine("Attempting to apply database migrations...");
-                // This applies any pending migrations to the database.
-                dbContext.Database.Migrate();
-                Console.WriteLine("Database migrations applied successfully.");
+        using var scope = app.ApplicationServices.CreateScope();
+        var services = scope.ServiceProvider;
+        var logger = services.GetRequiredService<ILogger<Program>>();
 
-                // Now, seed the initial user data.
-                SeedAdminUsers(dbContext, services.GetRequiredService<IConfiguration>());
-            }
-            catch (Exception ex)
+        try
+        {
+            var dbContext = services.GetRequiredService<MyContext>();
+
+            Console.WriteLine("Testing database connection...");
+
+            // Test connection first
+            if (!dbContext.Database.CanConnect())
             {
-                // Using a proper logger is better, but for now, this shows the error clearly.
-                Console.WriteLine($"FATAL: An error occurred during database initialization: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                // Re-throwing the exception will stop the application from starting in a broken state.
-                throw;
+                Console.WriteLine("❌ Cannot connect to database");
+                throw new InvalidOperationException("Cannot connect to the database");
             }
+
+            Console.WriteLine("✓ Database connection successful");
+
+            Console.WriteLine("Applying database migrations...");
+            dbContext.Database.Migrate();
+            Console.WriteLine("✓ Database migrations applied successfully");
+
+            // Seed admin users
+            SeedAdminUsers(dbContext, services.GetRequiredService<IConfiguration>(), logger);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Database initialization error: {ex.Message}");
+
+            // Log more details for common Railway/PostgreSQL issues
+            if (ex.Message.Contains("connection") || ex.Message.Contains("timeout"))
+            {
+                Console.WriteLine("This might be a Railway database connection issue. Please check:");
+                Console.WriteLine("1. Database service is running");
+                Console.WriteLine("2. Connection string is correct");
+                Console.WriteLine("3. Network connectivity");
+            }
+
+            throw;
         }
     }
 
-    // Simplified seeding method.
-    private static void SeedAdminUsers(MyContext dbContext, IConfiguration configuration)
+    private static void SeedAdminUsers(MyContext dbContext, IConfiguration configuration, ILogger logger)
     {
         Console.WriteLine("Checking if admin users need to be seeded...");
 
         if (dbContext.Users.Any())
         {
-            Console.WriteLine("Database already contains users. Skipping seed process.");
+            Console.WriteLine("✓ Database already contains users. Skipping seed process.");
             return;
         }
 
-        Console.WriteLine("No users found. Attempting to seed admin accounts...");
+        Console.WriteLine("No users found. Creating admin accounts...");
 
-        // Read admin details DIRECTLY from configuration.
-        // It automatically checks environment variables.
+        var usersToSeed = new List<User>();
+
+        // Admin 1
         var admin1Email = configuration["ADMIN1_EMAIL"];
         var admin1Username = configuration["ADMIN1_USERNAME"];
         var admin1Pass = configuration["ADMIN1_PASSWORD"];
 
+        // Admin 2  
         var admin2Email = configuration["ADMIN2_EMAIL"];
         var admin2Username = configuration["ADMIN2_USERNAME"];
         var admin2Pass = configuration["ADMIN2_PASSWORD"];
-
-        var usersToSeed = new List<User>();
 
         if (!string.IsNullOrEmpty(admin1Email) && !string.IsNullOrEmpty(admin1Username) && !string.IsNullOrEmpty(admin1Pass))
         {
@@ -146,11 +209,15 @@ public class Program
             {
                 email = admin1Email,
                 userName = admin1Username,
-                password = admin1Pass, // Note: You should be HASHING passwords, not storing them in plain text!
+                password = HashPassword(admin1Pass), // Hash the password!
                 Role = "Admin",
                 Age = 22
             });
-            Console.WriteLine($"Found configuration for Admin1: {admin1Username}");
+            Console.WriteLine($"✓ Prepared Admin1: {admin1Username} ({admin1Email})");
+        }
+        else
+        {
+            Console.WriteLine("⚠️  Admin1 configuration incomplete");
         }
 
         if (!string.IsNullOrEmpty(admin2Email) && !string.IsNullOrEmpty(admin2Username) && !string.IsNullOrEmpty(admin2Pass))
@@ -159,22 +226,56 @@ public class Program
             {
                 email = admin2Email,
                 userName = admin2Username,
-                password = admin2Pass, // Note: You should be HASHING passwords!
+                password = HashPassword(admin2Pass), // Hash the password!
                 Role = "Admin",
                 Age = 18
             });
-            Console.WriteLine($"Found configuration for Admin2: {admin2Username}");
+            Console.WriteLine($"✓ Prepared Admin2: {admin2Username} ({admin2Email})");
+        }
+        else
+        {
+            Console.WriteLine("⚠️  Admin2 configuration incomplete");
         }
 
         if (usersToSeed.Any())
         {
-            dbContext.Users.AddRange(usersToSeed);
-            dbContext.SaveChanges();
-            Console.WriteLine($"SUCCESS: Seeded {usersToSeed.Count} admin user(s) to the database.");
+            try
+            {
+                dbContext.Users.AddRange(usersToSeed);
+                dbContext.SaveChanges();
+                Console.WriteLine($"✅ SUCCESS: Seeded {usersToSeed.Count} admin user(s) to the database.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Failed to seed users: {ex.Message}");
+                throw;
+            }
         }
         else
         {
-            Console.WriteLine("WARNING: Could not seed any admin users. Check your ADMIN# environment variables in Railway.");
+            Console.WriteLine("⚠️  No admin users to seed. Check your environment variables.");
         }
+    }
+
+    // Helper method to hash passwords (basic implementation)
+    private static string HashPassword(string password)
+    {
+        using var sha256 = SHA256.Create();
+        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "YourSaltHere"));
+        return Convert.ToBase64String(hashedBytes);
+    }
+
+    // Helper method to sanitize connection string for logging
+    private static string SanitizeConnectionString(string connectionString)
+    {
+        if (string.IsNullOrEmpty(connectionString))
+            return "NULL";
+
+        // Hide password from connection string for logging
+        return System.Text.RegularExpressions.Regex.Replace(
+            connectionString,
+            @"Password=([^;]+)",
+            "Password=***",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 }
