@@ -19,6 +19,9 @@ public class Program
         Console.WriteLine("=== APPLICATION STARTUP ===");
         Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
         Console.WriteLine($"Application Name: {builder.Environment.ApplicationName}");
+        Console.WriteLine($"ENV: {Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")} ");
+        Console.WriteLine($"ENV: {Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")} ");
+
 
         // --- SERVICE CONFIGURATION ---
 
