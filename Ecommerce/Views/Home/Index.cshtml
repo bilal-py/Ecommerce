@@ -1,6 +1,11 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <style>
+        html {
+  scroll-behavior: smooth;
+}
+    </style>
     <!-- Site made with Mobirise Website Builder v5.7.12, https://mobirise.com -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,10 +26,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
     <link rel="preload" as="style" href="~/assets/MobiAssest/mobirise/css/mbr-additional.css">
     <link rel="stylesheet" href="~/assets/MobiAssest/mobirise/css/mbr-additional.css" type="text/css">
-
-
-
-
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
 <body>
     <Div style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
@@ -33,14 +35,14 @@
         <!-- Logo Positioned Absolutely -->
         <div class="container">
             <!-- Centered Logo -->
-            <img src="@Url.Content("~/Images/logo.png")"
-                 alt="MOTOPROTEKT Logo"
-                 style="max-width: 700px; width: 100%;"
-                 class="mb-4">
+           <img src="@Url.Content("~/Images/logo.png")"
+     alt="MOTOPROTEKT Logo"
+     style="max-width: 700px; width: 100%;"
+     class="mb-4"
+     data-aos="zoom-in">
 
-            <!-- Large Headline -->
-            <h1 class="text-white display-3 fw-4">Welcome to MOTOPROTEKT</h1>
-            <p class="text-white fs-4">High-quality PPF protection</p>
+<h1 class="text-white display-3 fw-4" data-aos="fade-up">Welcome to MOTOPROTEKT</h1>
+<p class="text-white fs-4" data-aos="fade-up" data-aos-delay="200">High-quality PPF protection</p>
         </div>
     </section>
 
@@ -51,7 +53,7 @@
                 <h4 class="mbr-section-subtitle mbr-fonts-style align-center mb-0 mt-2 display-5"></h4>
             </div>
             <div class="row mbr-gallery mt-4">
-                <div class="col-12 col-md-6 col-lg-3 item gallery-image">
+                <div class="col-12 col-md-6 col-lg-3 item gallery-image" data-aos="fade-up" data-aos-delay="100">
                     <div class="item-wrapper" data-toggle="modal" data-bs-toggle="modal" data-target="#uQFBFRIQtq-modal" data-bs-target="#uQFBFRIQtq-modal">
                         <img class="w-100" src="~/Images/img1.png" alt="Mobirise Website Builder" data-slide-to="0" data-bs-slide-to="0" data-target="#lb-uQFBFRIQtq" data-bs-target="#lb-uQFBFRIQtq">
                         <div class="icon-wrapper">
@@ -298,7 +300,13 @@
     <script src="~/assets/MobiAssest/embla/embla.min.js"></script>
     <script src="~/assets/MobiAssest/embla/script.js"></script>
     <script src="~/assets/MobiAssest/theme/js/script.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
 
 </body>
 </html>
