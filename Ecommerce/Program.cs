@@ -25,6 +25,7 @@ public class Program
         if (builder.Environment.IsDevelopment())
         {
             connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            //connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         }
         else
         {
@@ -98,9 +99,12 @@ public class Program
         {
             app.UseDeveloperExceptionPage();
         }
-
-        var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-        app.Urls.Add($"http://0.0.0.0:{port}");
+        if (!builder.Environment.IsDevelopment())
+        {
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            app.Urls.Add($"http://0.0.0.0:{port}");
+        }
+        
 
         app.UseStaticFiles();
         app.UseRouting();
