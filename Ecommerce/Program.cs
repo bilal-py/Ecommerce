@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Models;
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -45,6 +46,8 @@ public class Program
         builder.Services.AddTransient<IEmailService, EmailService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+        builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 
         builder.Services.AddDbContext<MyContext>(options =>
         {
