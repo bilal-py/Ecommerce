@@ -1,0 +1,55 @@
+
+body {
+    background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    padding-top: 80px;
+    min-height: 100vh;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.nav-link:hover {
+    background-color: #343a40;
+    color: #ffd700 !important;
+}
+
+.nav-link i {
+    width: 20px;
+}
+
+
+
+
+@media (max-width: 767.98px /* Mobile devices */)  {
+    .mobile-menu-btn {
+    display: block;
+    position: fixed;        /* changed from absolute */
+    top: 70px;              /* adjust spacing below navbar */
+    right: 20px;            /* stick to right side */
+    z-index: 1050;          /* higher than navbar (default is 1030) */
+    background-color: #212529;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+.offcanvas {
+    background: #343a40 !important;
+    max-width: 300px;
+}
