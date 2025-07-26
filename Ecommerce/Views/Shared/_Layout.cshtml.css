@@ -46,3 +46,28 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Navbar background */
+#mainNav {
+    background-color: #212529;
+    padding: 15px 0;
+}
+
+/* Toggler button styling */
+.navbar-toggler {
+    color: white;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* Mobile menu styling */
+.navbar-collapse {
+    background-color: #212529;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+/* Ensure links are visible */
+.navbar-nav .nav-link {
+    color: white !important;
+    padding: 10px 15px;
+}
