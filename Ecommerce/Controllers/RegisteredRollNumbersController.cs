@@ -201,5 +201,49 @@ namespace Ecommerce.Controllers
             };
         }
 
+        [Authorize(Roles = "Admin")]
+        // GET: RegisteredRollNumbers/BulkUpdate
+        public IActionResult BulkUpdate()
+        {
+            var viewModel = new RegisteredRollNumbers
+            {
+                Status = "Active",
+                CategoryList = GetCategoryList()
+            };
+            return View(viewModel);
+        }
+
+        // POST: RegisteredRollNumbers/BulkUpdate
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
+        public async Task<IActionResult> BulkUpdate(RegisteredRollNumbers registeredRollNumbers)
+        {
+            if (ModelState.IsValid)
+            {
+                var bulkRegister = registeredRollNumbers.RollNumber.Split().ToList();
+                var registerUtility = new RegisteredRollNumbers();
+                foreach( string rollnumber in bulkRegister)
+                {
+                    registerUtility.Id = Guid.NewGuid();
+                    registerUtility.RollNumber = rollnumber;
+                    registerUtility.RegistrationDate = DateTime.SpecifyKind(registeredRollNumbers.RegistrationDate, DateTimeKind.Utc);
+                    registerUtility.Status = "Active";
+                    registerUtility.Category = registeredRollNumbers.Category;
+                    _context.Add(registerUtility);
+                    await _context.SaveChangesAsync();
+
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            registeredRollNumbers.CategoryList = GetCategoryList();
+
+            return View(registeredRollNumbers);
+        }
+
     }
 }
