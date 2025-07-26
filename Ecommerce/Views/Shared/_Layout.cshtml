@@ -4,21 +4,7 @@
         background: #212529; /* dark grey to white */
     }
 
-    .logo-border {
-        display: inline-block;
-        padding: 10px 20px;
-        border: 2px solid white; /* White border */
-        border-radius: 25px; /* Rounded corners */
-        color: white; /* Text color */
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-        .logo-border:hover {
-            background-color: white; /* On hover */
-            color: #000 !important; /* Dark text */
-        }
+   
 
     .logo-border {
         display: inline-block;
@@ -31,10 +17,10 @@
         transition: all 0.3s ease;
     }
 
-        .logo-border:hover {
+       /*  .logo-border:hover {
             background-color: white;
             color: #000 !important;
-        }
+        } */
 
     html {
         scroll-behavior: smooth;
@@ -106,6 +92,10 @@
             color: white !important;
             padding: 10px 15px;
         }
+
+        .logo {
+            height: 40px; /* adjust as needed */
+        }
     </style>
 </head>
 
@@ -113,8 +103,9 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
-            <a class="navbar-brand logo-border" style="font-size:25px;" asp-controller="Home" asp-action="Index">MOTOPROTEKT</a>
-
+            <a class="navbar-brand logo-border" asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo.png" class="logo" alt="MotoProtekt Logo" />
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
