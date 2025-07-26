@@ -70,6 +70,7 @@
     }
 
     <div class="container-fluid">
+       
         <div class="row min-vh-100">
 
             <!-- Left Sidebar (Vertical Menu) -->
@@ -77,34 +78,32 @@
             <!-- Sidebar -->
             <div class="d-flex flex-column bg-dark text-white p-4 vh-100" style="width: 300px;">
                 <h3 class="text-primary">Welcome, @userName</h3>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyRegistration')">
-                    <i class="fas fa-cogs"></i> Warranty Registration
-                </a>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyPending')">
-                    <i class="fas fa-table"></i> Warranty Pending
-                </a>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyApproved')">
-                    <i class="fas fa-th"></i> Warranty Approved
-                </a>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/ExpiredWarranty')">
-                    <i class="fas fa-info-circle"></i> Expired Warranty
-                </a>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/Settings')">
-                    <i class="fas fa-sliders-h"></i> Settings
-                </a>
-                <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/Account')">
-                    <i class="fas fa-sliders-h"></i> Account
-                </a>
+                
+                    <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyRegistration')">
+                        <i class="fas fa-cogs"></i> Warranty Registration
+                    </a>
+                    <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyPending')">
+                        <i class="fas fa-table"></i> Warranty Pending
+                    </a>
+                    <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/WarrantyApproved')">
+                        <i class="fas fa-th"></i> Warranty Approved
+                    </a>
+                    <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/ExpiredWarranty')">
+                        <i class="fas fa-info-circle"></i> Expired Warranty
+                    </a>
+                   @*  <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/Settings')">
+                        <i class="fas fa-sliders-h"></i> Settings
+                    </a>
+                    <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Warranties/Account')">
+                        <i class="fas fa-sliders-h"></i> Account
+                    </a> *@
+            
             </div>
             <!-- Right Content Area -->
             <div class="col-md-8 col-lg-9 p-4" id="subview-container">
                 <!-- Partial views will load here -->
                 <div class="text-white">Please select an option from the menu.</div>
             </div>
-
-
-
-
 
 
     <div id="subview-container" style="display: none;"></div>
