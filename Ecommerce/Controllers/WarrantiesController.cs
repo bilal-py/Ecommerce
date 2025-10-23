@@ -347,7 +347,7 @@ using System.Threading.Tasks;
             }
 
 
-            //
+            //Save the warranty
             _context.Warranties.Add(warranty);
             await _context.SaveChangesAsync();
 
