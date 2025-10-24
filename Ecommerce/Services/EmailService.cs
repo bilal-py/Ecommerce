@@ -78,21 +78,21 @@ namespace Ecommerce.Services
             }
 
             // Use a cancellation token so ConnectAsync can't hang forever
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+            using var connectCts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
 
             try
             {
                 Console.WriteLine("Connecting to SMTP server...");
-                await smtp.ConnectAsync(host, port, secureOption, cts.Token);
+                await smtp.ConnectAsync(host, port, secureOption, connectCts.Token);
 
                 // Authenticate only if credentials are provided
                 if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
                 {
                     Console.WriteLine("Authenticating to SMTP server...", username);
-                    await smtp.AuthenticateAsync(username, password, cts.Token);
+                    await smtp.AuthenticateAsync(username, password, connectCts.Token);
                 }
                 Console.WriteLine("Sending email...");
-                await smtp.SendAsync(email, cts.Token);
+                await smtp.SendAsync(email, connectCts.Token);
             }
             catch (OperationCanceledException)
             {
