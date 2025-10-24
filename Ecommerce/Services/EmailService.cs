@@ -82,7 +82,7 @@ namespace Ecommerce.Services
 
             try
             {
-                Console.WriteLine("Connecting to SMTP server...");
+                Console.WriteLine($"Attempting connection to {host}:{port} with SecureOption: {secureOption}...");
                 await smtp.ConnectAsync(host, port, secureOption, connectCts.Token);
 
                 // Authenticate only if credentials are provided
