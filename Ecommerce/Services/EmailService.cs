@@ -82,14 +82,16 @@ namespace Ecommerce.Services
 
             try
             {
+                Console.WriteLine("Connecting to SMTP server...");
                 await smtp.ConnectAsync(host, port, secureOption, cts.Token);
 
                 // Authenticate only if credentials are provided
                 if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
                 {
+                    Console.WriteLine("Authenticating to SMTP server...", username);
                     await smtp.AuthenticateAsync(username, password, cts.Token);
                 }
-
+                Console.WriteLine("Sending email...");
                 await smtp.SendAsync(email, cts.Token);
             }
             catch (OperationCanceledException)
