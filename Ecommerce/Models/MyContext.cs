@@ -41,5 +41,6 @@ namespace Ecommerce.Models
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Dealer> Dealers { get; set; }
         public DbSet<Ecommerce.Models.RegisteredRollNumbers> RegisteredRollNumber { get; set; } = default!;
+        public DbSet<EmailLog> EmailLogs { get; set; }
     }
 }
