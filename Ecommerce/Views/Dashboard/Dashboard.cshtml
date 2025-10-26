@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "User Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -101,6 +100,14 @@
                 <a href="#" class="nav-link text-white mb-3 d-flex align-items-center gap-2" onclick="loadSubview('/Dashboard/Account')">
                     <i class="fas fa-sliders-h"></i> Account
                 </a>
+    
+                @* Admin-only link to view email logs *@
+                @if (User?.IsInRole("Admin") ?? false)
+                {
+                    <a href="#" class="nav-link text-warning mt-3 d-flex align-items-center gap-2" onclick="loadSubview('/EmailLogs')">
+                        <i class="fas fa-envelope-open-text"></i> Email Logs
+                    </a>
+                }
             </div>
             <!-- Right Content Area -->
             <div class="col-md-8 col-lg-9 p-4" id="subview-container">

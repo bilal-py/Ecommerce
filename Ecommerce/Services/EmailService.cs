@@ -35,14 +35,14 @@ namespace Ecommerce.Services
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            //await smtp.ConnectAsync(_config["Email:SmtpHost"],
-            //    int.Parse(_config["Email:Port"]),
-            //    SecureSocketOptions.StartTls);
+            await smtp.ConnectAsync(_config["Email:SmtpHost"],
+                int.Parse(_config["Email:Port"]),
+                SecureSocketOptions.StartTls);
 
-            await smtp.ConnectAsync(
-                _config["Email:SmtpHost"],
-                465,
-                SecureSocketOptions.SslOnConnect);
+            //await smtp.ConnectAsync(
+            //    _config["Email:SmtpHost"],
+            //    465,
+            //    SecureSocketOptions.SslOnConnect);
 
             await smtp.AuthenticateAsync(_config["Email:Username"], _config["Email:Password"]);
             await smtp.SendAsync(email);

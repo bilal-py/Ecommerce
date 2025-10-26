@@ -12,286 +12,286 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-    namespace Ecommerce.Controllers
+namespace Ecommerce.Controllers
+{
+    public class WarrantiesController : Controller
     {
-        public class WarrantiesController : Controller
+        private readonly MyContext _context;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _config;
+
+        public WarrantiesController(MyContext context, IEmailService emailService, IConfiguration config)
         {
-            private readonly MyContext _context;
-            private readonly IEmailService _emailService;
-            private readonly IConfiguration _config;
+            _context = context;
+            _emailService = emailService;
+            _config = config;
+        }
 
-            public WarrantiesController(MyContext context, IEmailService emailService, IConfiguration config)
-            {
-                _context = context;
-                _emailService = emailService;
-                _config = config;
-            }
-
-            [Authorize]
-            // GET: Warranties
-            public async Task<IActionResult> Index()
-            {
-                var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer).Include(w => w.RegisteredRollNumber);
+        [Authorize]
+        // GET: Warranties
+        public async Task<IActionResult> Index()
+        {
+            var myContext = _context.Warranties.Include(w => w.Customer).Include(w => w.Dealer).Include(w => w.RegisteredRollNumber);
             return View(await myContext.ToListAsync());
-            }
-            [Authorize]
-            // GET: Warranties/Details/5
-            public async Task<IActionResult> Details(Guid? id)
+        }
+        [Authorize]
+        // GET: Warranties/Details/5
+        public async Task<IActionResult> Details(Guid? id)
+        {
+            if (id == null || _context.Warranties == null)
             {
-                if (id == null || _context.Warranties == null)
+                return NotFound();
+            }
+
+            var warranty = await _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
+                .FirstOrDefaultAsync(m => m.WarrantyId == id);
+            if (warranty == null)
+            {
+                return NotFound();
+            }
+
+            return View(warranty);
+        }
+        
+        [Authorize]
+        // GET: Warranties/Create
+        public IActionResult Create()
+        {
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName");
+            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName");
+            return View();
+        }
+
+        // POST: Warranties/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Create(Warranty warranty, Customer customer)
+        {
+            if (ModelState.IsValid)
+            {
+                // Check if customer exists
+                var existingCustomer = _context.Customers.FirstOrDefault(c => c.Email == customer.Email);
+
+                if (existingCustomer != null)
                 {
-                    return NotFound();
+                    warranty.CustomerId = existingCustomer.CustomerId;
                 }
-
-                var warranty = await _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Include(w => w.RegisteredRollNumber)
-                    .FirstOrDefaultAsync(m => m.WarrantyId == id);
-                if (warranty == null)
+                else
                 {
-                    return NotFound();
-                }
-
-                return View(warranty);
-            }
-            
-            [Authorize]
-            // GET: Warranties/Create
-            public IActionResult Create()
-            {
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName");
-                ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName");
-                return View();
-            }
-
-            // POST: Warranties/Create
-            // To protect from overposting attacks, enable the specific properties you want to bind to.
-            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            [Authorize]
-            public async Task<IActionResult> Create(Warranty warranty, Customer customer)
-            {
-                if (ModelState.IsValid)
-                {
-                    // Check if customer exists
-                    var existingCustomer = _context.Customers.FirstOrDefault(c => c.Email == customer.Email);
-
-                    if (existingCustomer != null)
-                    {
-                        warranty.CustomerId = existingCustomer.CustomerId;
-                    }
-                    else
-                    {
-                        customer.CustomerId = Guid.NewGuid();
-                        _context.Customers.Add(customer);
-                        await _context.SaveChangesAsync();
-                        warranty.CustomerId = customer.CustomerId;
-                    }
-
-                    warranty.WarrantyId = Guid.NewGuid();
-                    _context.Warranties.Add(warranty);
+                    customer.CustomerId = Guid.NewGuid();
+                    _context.Customers.Add(customer);
                     await _context.SaveChangesAsync();
-
-                    return RedirectToAction(nameof(Index));
+                    warranty.CustomerId = customer.CustomerId;
                 }
 
-                return View(warranty);
-            }
-
-            [Authorize]
-            // GET: Warranties/Edit/5
-            public async Task<IActionResult> Edit(Guid? id)
-            {
-                if (id == null || _context.Warranties == null)
-                {
-                    return NotFound();
-                }
-
-                var warranty = await _context.Warranties.FindAsync(id);
-                if (warranty == null)
-                {
-                    return NotFound();
-                }
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName", warranty.CustomerId);
-                ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
-                return View(warranty);
-            }
-
-            // POST: Warranties/Edit/5
-            // To protect from overposting attacks, enable the specific properties you want to bind to.
-            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            [Authorize]
-            public async Task<IActionResult> Edit(Guid id, [Bind("WarrantyId,RollNumber,Status,WarrantyStartDate,WarrantyEndDate,VehicleYear,VehicleMake,VehicleModel,VehicleVIN,CustomerId,DealerId,BumpersFront,HoodLead,Mirrors,BumpersBack,EdgeGuard,Windshield,FendersLead,RoofFull,HoodFull,RoofLead,Headlamps,Trunk")] Warranty warranty)
-            {
-                if (id != warranty.WarrantyId)
-                {
-                    return NotFound();
-                }
-
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        _context.Update(warranty);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!WarrantyExists(warranty.WarrantyId))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction(nameof(Index));
-                }
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName", warranty.CustomerId);
-                ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
-                return View(warranty);
-            }
-            
-            [Authorize]
-            // GET: Warranties/Delete/5
-            public async Task<IActionResult> Delete(Guid? id)
-            {
-                if (id == null || _context.Warranties == null)
-                {
-                    return NotFound();
-                }
-
-                var warranty = await _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Include(w => w.RegisteredRollNumber)
-                    .FirstOrDefaultAsync(m => m.WarrantyId == id);
-                if (warranty == null)
-                {
-                    return NotFound();
-                }
-
-                return View(warranty);
-            }
-            [Authorize]
-            // POST: Warranties/Delete/5
-            [HttpPost, ActionName("Delete")]
-            [ValidateAntiForgeryToken]
-            public async Task<IActionResult> DeleteConfirmed(Guid id)
-            {
-                if (_context.Warranties == null)
-                {
-                    return Problem("Entity set 'MyContext.Warranties'  is null.");
-                }
-                var warranty = await _context.Warranties.FindAsync(id);
-                if (warranty != null)
-                {
-                    _context.Warranties.Remove(warranty);
-                }
-            
+                warranty.WarrantyId = Guid.NewGuid();
+                _context.Warranties.Add(warranty);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
 
-            private bool WarrantyExists(Guid id)
+            return View(warranty);
+        }
+
+        [Authorize]
+        // GET: Warranties/Edit/5
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            if (id == null || _context.Warranties == null)
             {
-              return (_context.Warranties?.Any(e => e.WarrantyId == id)).GetValueOrDefault();
+                return NotFound();
             }
 
-            [HttpGet]
-            [Authorize]
-            public IActionResult GetCustomerByEmail(string email)
+            var warranty = await _context.Warranties.FindAsync(id);
+            if (warranty == null)
             {
-                var customer = _context.Customers.FirstOrDefault(c => c.Email == email);
-                if (customer == null) return Json(null);
+                return NotFound();
+            }
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName", warranty.CustomerId);
+            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
+            return View(warranty);
+        }
 
-                return Json(new
+        // POST: Warranties/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Edit(Guid id, [Bind("WarrantyId,RollNumber,Status,WarrantyStartDate,WarrantyEndDate,VehicleYear,VehicleMake,VehicleModel,VehicleVIN,CustomerId,DealerId,BumpersFront,HoodLead,Mirrors,BumpersBack,EdgeGuard,Windshield,FendersLead,RoofFull,HoodFull,RoofLead,Headlamps,Trunk")] Warranty warranty)
+        {
+            if (id != warranty.WarrantyId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    customerId = customer.CustomerId,
-                    customerName = customer.CustomerName,
-                    phoneNumber = customer.PhoneNumber,
-                    address = customer.Address,
-                    city = customer.City,
-                    state = customer.State,
-                    zip = customer.Zip
-                });
+                    _context.Update(warranty);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!WarrantyExists(warranty.WarrantyId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
-
-            [Authorize]
-            // GET: /Dashboard
-            public IActionResult Dashboard()
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName", warranty.CustomerId);
+            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName", warranty.DealerId);
+            return View(warranty);
+        }
+        
+        [Authorize]
+        // GET: Warranties/Delete/5
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            if (id == null || _context.Warranties == null)
             {
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName");
-                ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName");
-
-
-                return View();
+                return NotFound();
             }
-            [Authorize]
-            // GET: /Dashboard/WarrantyRegistration
-            public IActionResult WarrantyRegistration()
+
+            var warranty = await _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
+                .FirstOrDefaultAsync(m => m.WarrantyId == id);
+            if (warranty == null)
             {
-                return PartialView("_WarrantyRegistration");
+                return NotFound();
             }
+
+            return View(warranty);
+        }
+        [Authorize]
+        // POST: Warranties/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            if (_context.Warranties == null)
+            {
+                return Problem("Entity set 'MyContext.Warranties'  is null.");
+            }
+            var warranty = await _context.Warranties.FindAsync(id);
+            if (warranty != null)
+            {
+                _context.Warranties.Remove(warranty);
+            }
+        
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool WarrantyExists(Guid id)
+        {
+          return (_context.Warranties?.Any(e => e.WarrantyId == id)).GetValueOrDefault();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetCustomerByEmail(string email)
+        {
+            var customer = _context.Customers.FirstOrDefault(c => c.Email == email);
+            if (customer == null) return Json(null);
+
+            return Json(new
+            {
+                customerId = customer.CustomerId,
+                customerName = customer.CustomerName,
+                phoneNumber = customer.PhoneNumber,
+                address = customer.Address,
+                city = customer.City,
+                state = customer.State,
+                zip = customer.Zip
+            });
+        }
+
+        [Authorize]
+        // GET: /Dashboard
+        public IActionResult Dashboard()
+        {
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "CustomerId", "CustomerName");
+            ViewData["DealerId"] = new SelectList(_context.Dealers, "DealerId", "DealerName");
+
+
+            return View();
+        }
+        [Authorize]
+        // GET: /Dashboard/WarrantyRegistration
+        public IActionResult WarrantyRegistration()
+        {
+            return PartialView("_WarrantyRegistration");
+        }
         // GET: /Dashboard/ExpiredWarranty
         [Authorize]
         public IActionResult ExpiredWarranty()
-            {
-                return PartialView("_ExpiredWarranty");
-            }
+        {
+            return PartialView("_ExpiredWarranty");
+        }
         // GET: /Dashboard/WarrantyPending
         [Authorize]
-            public async Task<IActionResult> WarrantyPending(string dealerId)
+        public async Task<IActionResult> WarrantyPending(string dealerId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            var user = await _context.Users.FindAsync(userId);
+
+            IQueryable<Warranty> query = _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
+                .Where(w => w.Status == 0); // Pending
+
+            if (role == "Dealer")
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var role = User.FindFirstValue(ClaimTypes.Role);
-                var user = await _context.Users.FindAsync(userId);
-
-                IQueryable<Warranty> query = _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Include(w => w.RegisteredRollNumber)
-                    .Where(w => w.Status == 0); // Pending
-
-                if (role == "Dealer")
-                {
-                    query = query.Where(w => w.DealerId == user.DealerId);
-                }
-
-                var warranties = await query.ToListAsync();
-
-                return PartialView("_WarrantyPending", warranties); 
+                query = query.Where(w => w.DealerId == user.DealerId);
             }
 
+            var warranties = await query.ToListAsync();
 
-            // GET: /Dashboard/WarrantyApproved
-            [Authorize]
-            public async Task<IActionResult> WarrantyApproved(String dealerId)
+            return PartialView("_WarrantyPending", warranties); 
+        }
+
+
+        // GET: /Dashboard/WarrantyApproved
+        [Authorize]
+        public async Task<IActionResult> WarrantyApproved(String dealerId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            var user = await _context.Users.FindAsync(userId);
+
+            IQueryable<Warranty> query = _context.Warranties
+                .Include(w => w.Customer)
+                .Include(w => w.Dealer)
+                .Include(w => w.RegisteredRollNumber)
+                .Where(w => w.Status == 1); // Approved
+
+            if (role == "Dealer")
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var role = User.FindFirstValue(ClaimTypes.Role);
-                var user = await _context.Users.FindAsync(userId);
-
-                IQueryable<Warranty> query = _context.Warranties
-                    .Include(w => w.Customer)
-                    .Include(w => w.Dealer)
-                    .Include(w => w.RegisteredRollNumber)
-                    .Where(w => w.Status == 1); // Approved
-
-                if (role == "Dealer")
-                {
-                    query = query.Where(w => w.DealerId == user.DealerId);
-                }
-
-                var warranties = await query.ToListAsync();
-
-                return PartialView("_WarrantyApproved", warranties);
+                query = query.Where(w => w.DealerId == user.DealerId);
             }
+
+            var warranties = await query.ToListAsync();
+
+            return PartialView("_WarrantyApproved", warranties);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -357,10 +357,8 @@ using System.Threading.Tasks;
             var adminEmail = _config["Email:AdminEmail"];
             var dealer = await _context.Dealers.FindAsync(warranty.DealerId);
 
-
-
             // TEMP EMAILS (Replace with real ones)
-           
+            
             var dealerEmail = dealer?.Email ?? _config["Email:AdminEmail"];
             var customerEmail = customer?.Email ?? _config["Email:AdminEmail"];
 
@@ -372,12 +370,40 @@ using System.Threading.Tasks;
 
             string emailBody = sb.ToString();
 
-            await _emailService.SendEmailAsync(
-                to: customerEmail,
-                subject: "Warranty Submitted",
-                body: emailBody,
-                cc: new List<string> { dealerEmail, adminEmail }
-            );
+            // Log email before sending
+            var emailLog = new EmailLog
+            {
+                ToEmail = customerEmail,
+                Cc = string.Join(";", new[] { dealerEmail, adminEmail }),
+                Subject = "Warranty Submitted",
+                Body = emailBody,
+                EmailSent = false,
+                CreatedAt = DateTime.UtcNow,
+                WarrantyId = warranty.WarrantyId
+            };
+
+            _context.EmailLogs.Add(emailLog);
+            await _context.SaveChangesAsync();
+
+            //try
+            //{
+            //    await _emailService.SendEmailAsync(
+            //        to: customerEmail,
+            //        subject: "Warranty Submitted",
+            //        body: emailBody,
+            //        cc: new List<string> { dealerEmail, adminEmail }
+            //    );
+
+            //    // update log to indicate success
+            //    emailLog.EmailSent = true;
+            //    _context.Update(emailLog);
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    // keep EmailSent = false; optionally record error in Body or another column
+            //    // Could add logging here
+            //}
 
             return RedirectToAction("Dashboard");
         }
@@ -471,14 +497,39 @@ using System.Threading.Tasks;
                 body = BuildRejectedEmailTemplate(warranty, customer, dealer, registeredRollNumber);
             }
 
+            // Log email before sending
+            var statusEmailLog = new EmailLog
+            {
+                ToEmail = customerEmail,
+                Cc = string.Join(";", new[] { dealerEmail, adminEmail }),
+                Subject = subject,
+                Body = body,
+                EmailSent = false,
+                CreatedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                WarrantyId = warranty.WarrantyId
+            };
 
+            _context.EmailLogs.Add(statusEmailLog);
+            await _context.SaveChangesAsync();
 
-            await _emailService.SendEmailAsync(
-                to: customerEmail,
-                subject: subject,
-                body: body,
-                cc: new List<string> { dealerEmail, adminEmail }
-            );
+            //try
+            //{
+            //    await _emailService.SendEmailAsync(
+            //        to: customerEmail,
+            //        subject: subject,
+            //        body: body,
+            //        cc: new List<string> { dealerEmail, adminEmail }
+            //    );
+
+            //    // update log to indicate success
+            //    statusEmailLog.EmailSent = true;
+            //    _context.Update(statusEmailLog);
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    // keep EmailSent = false; optionally record error
+            //}
 
             return RedirectToAction("Dashboard");
         }
@@ -553,11 +604,6 @@ using System.Threading.Tasks;
                 categoryName = detail.Name;
                 categoryDescription = detail.Description;
             }
-
-
-
-
-
 
             var packageItems = packageNames.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
             var individualItems = individualNames.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
