@@ -644,9 +644,9 @@ namespace Ecommerce.Controllers
             sb.AppendLine("<p>We're pleased to let you know that your warranty request has been <strong>approved</strong>!</p>");
             sb.AppendLine("<p>Below are your warranty details:</p>");
             sb.AppendLine(BuildWarrantyEmailTemplate(warranty, customer, dealer, registeredRollNumbers));
-            sb.AppendLine("<p>If you have any questions, our support team is ready to assist—just reply to this email or call us at [support number].</p>");
+            sb.AppendLine("<p>If you have any questions, our support team is ready to assist—just reply to this email or call us at <a href='mailto:support@motoprotekt.de'>support@motoprotekt.de</a>.</p>");
             sb.AppendLine("<p>Thank you for choosing MotoProtekt!</p>");
-            sb.AppendLine("<p>Warm regards,<br/>MotoProtekt Support Team</p>");
+            sb.AppendLine("<p>Warm regards,<br/>MotoProtekt Gmbh Support Team</p>");
             return sb.ToString();
         }
 
