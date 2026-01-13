@@ -68,8 +68,8 @@
 <body class="login-gradient-bg" style="padding-top: 80px;">
     <div class="d-flex justify-content-center align-items-center py-5">
         <div class="auth-card shadow-lg w-100" style="max-width: 1050px;">
-
-            <!-- LEFT: Login pane -->
+          <div class="row g-0">
+                <!-- LEFT: Login pane -->
             <div class="left-pane p-5 col-12 col-md-6">
                 <h2 class="fw-bold display-6 mb-1">Welcome back</h2>
                 <p class="text-muted mb-4" style="color:#c9c9c9!important;">Please enter your account details</p>
@@ -107,7 +107,11 @@
 
                     <!-- Submit -->
                     <button type="submit" class="gradient-btn mb-4">Sign in</button>
+                        <button type="submit" class="gradient-btn mb-4" asp-controller="Account" asp-action="CreateAccount">Create Account</button>
 
+                       @*  <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="CreateAccount">Create Account</a>
+                        </li> *@
                     <!-- Social icons -->
                    @*  <div class="d-flex justify-content-center gap-3">
                         <a href="#"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="32" height="32" /></a>
@@ -118,7 +122,10 @@
             </div>
 
             <!-- RIGHT: Testimonial pane -->
-
+            <div class="right-pane p-5 col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <img src="~/images/warranty-banner.png" class="img-fluid" />
+            </div>
+        </div>
         </div>
     </div>
 </body>
