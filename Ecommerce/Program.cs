@@ -244,7 +244,7 @@ public class Program
         }
     }
 
-    // Helper method to hash passwords (basic implementation)
+    // Helper method to hash passwords 
     private static string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();
