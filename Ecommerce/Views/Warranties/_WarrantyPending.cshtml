@@ -4,10 +4,18 @@
     ViewData["Title"] = "WarrantyPendingPage";
     var isAdmin = User.IsInRole("Admin");
 }
+@{
+    var categoryNames = new Dictionary<string, string>
+    {
+        { "A", "Prime" },
+        { "B", "Ultimate" },
+        { "C", "Ultimate Plus" }
+    };
+}
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
-    <div class="col-md-10">
-        <h3 class="mb-4 text-center">Warranty Pending</h3>
+    <div class="table-responsive">
+        <h3 class="mb-4 text-center text-white">Warranty Pending</h3>
 
         <table class="table table-bordered table-hover text-center">
             <thead class="table-primary">
@@ -17,6 +25,12 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Dealer</th>
+                    <th>Vehicle Year</th>
+                    <th>Vehicle Make</th>
+                    <th>Vehicle Model</th>
+                    <th>Warranty Start Date</th>
+                    <th>Roll Number</th>
+                    <th>Warranty Period</th>
                     <th>Status</th>
                     @if (isAdmin)
                     {
@@ -34,6 +48,19 @@
                         <td>@item.Customer?.Email</td>
                         <td>@item.Customer?.PhoneNumber</td>
                         <td>@item.Dealer?.DealerName</td>
+                        <td>@item.VehicleYear</td>
+                        <td>@item.VehicleMake</td>
+                        <td>@item.VehicleModel</td>
+                        <td>@item.WarrantyStartDate</td>
+                        <td>@item.RollNumber</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.RegisteredRollNumber?.Category) && categoryNames.TryGetValue(item.RegisteredRollNumber.Category, out var friendlyName))
+                            {
+                                @friendlyName
+                            }
+                        </td>
+
+
                         <td>Pending</td>
 
                         @if (isAdmin)
@@ -57,54 +84,3 @@
         </table>
     </div>
 </div>
-@* 
-
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 40vh;">
-    <div class="col-md-8 col-lg-6">
-        <h3 class="mb-4 text-center">Warranty Pending</h3>
-
-        <table class="table table-bordered table-hover text-center">
-            <thead class="table-primary">
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Status</th>
-                    <th>Actions</th> <!-- Last column -->
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>John Doe</td>
-                    <td>john@example.com</td>
-                    <td>+91-9876543210</td>
-                    <td>Pending</td>
-                    <td>
-                        <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-success btn-sm px-3">Accept</button>
-                            <button class="btn btn-danger btn-sm px-3">Reject</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Jane Smith</td>
-                    <td>jane@example.com</td>
-                    <td>+91-9123456789</td>
-                    <td>Pending</td>
-                    <td>
-                        <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-success btn-sm px-3">Accept</button>
-                            <button class="btn btn-danger btn-sm px-3">Reject</button>
-                        </div>
-                    </td>
-                </tr>
-                <!-- More rows as needed -->
-            </tbody>
-        </table>
-    </div>
-</div>
-
- *@

@@ -107,6 +107,12 @@ namespace Ecommerce.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Contact")
+                        .HasColumnType("text");
+
                     b.Property<string>("DealerName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -115,12 +121,55 @@ namespace Ecommerce.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Location")
+                    b.Property<string>("FirmName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GSTNumber")
                         .HasColumnType("text");
 
                     b.HasKey("DealerId");
 
                     b.ToTable("Dealers");
+                });
+
+            modelBuilder.Entity("Ecommerce.Models.EmailLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Cc")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("EmailSent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ToEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid?>("WarrantyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailLogs");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.RegisteredRollNumbers", b =>
@@ -229,6 +278,12 @@ namespace Ecommerce.Migrations
                     b.Property<bool>("Mirrors")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("RegisteredRollNumberId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RegisteredRollNumbersId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("RollNumber")
                         .IsRequired()
                         .HasColumnType("text");
@@ -279,6 +334,10 @@ namespace Ecommerce.Migrations
 
                     b.HasIndex("DealerId");
 
+                    b.HasIndex("RegisteredRollNumbersId");
+
+                    b.HasIndex("RollNumber");
+
                     b.ToTable("Warranties");
                 });
 
@@ -314,9 +373,22 @@ namespace Ecommerce.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Ecommerce.Models.RegisteredRollNumbers", null)
+                        .WithMany("Warranties")
+                        .HasForeignKey("RegisteredRollNumbersId");
+
+                    b.HasOne("Ecommerce.Models.RegisteredRollNumbers", "RegisteredRollNumber")
+                        .WithMany()
+                        .HasForeignKey("RollNumber")
+                        .HasPrincipalKey("RollNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
 
                     b.Navigation("Dealer");
+
+                    b.Navigation("RegisteredRollNumber");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Customer", b =>
@@ -325,6 +397,11 @@ namespace Ecommerce.Migrations
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Dealer", b =>
+                {
+                    b.Navigation("Warranties");
+                });
+
+            modelBuilder.Entity("Ecommerce.Models.RegisteredRollNumbers", b =>
                 {
                     b.Navigation("Warranties");
                 });

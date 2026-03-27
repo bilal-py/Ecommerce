@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ecommerce.Models
 {
@@ -15,6 +17,15 @@ namespace Ecommerce.Models
         [DataType(DataType.Date)]
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
-        public string Status { get; set; }
+        public string Status { get; set; } = "Active";
+
+        [NotMapped]
+        public List<SelectListItem> CategoryList { get; set; } = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "A", Text = "Prime" },
+            new SelectListItem { Value = "B", Text = "Ultimate" },
+            new SelectListItem { Value = "C", Text = "Ultimate Plus" }
+        };
+        public ICollection<Warranty> ?Warranties { get; set; }
     }
 }

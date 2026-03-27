@@ -30,5 +30,12 @@ namespace Ecommerce.Models
         [Required(ErrorMessage = "Age is required")]
         [Range(16, int.MaxValue, ErrorMessage = "Age must be 16 or greater")]
         public int? Age { get; set; }
+
+        [Phone]
+        public string? Contact { get; set; }
+        public string? Address { get; set; }
+        public string? GSTNumber { get; set; }
+        public string? FirmName { get; set; }
+
     }
 }

@@ -63,6 +63,12 @@ namespace Ecommerce.Controllers
             return LocalRedirect("/");
         }
 
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult CreateAccount()
         {
@@ -91,7 +97,11 @@ namespace Ecommerce.Controllers
             {
                 DealerId = dealerId.Value,
                 DealerName = model.UserName,
-                Email = model.Email
+                Email = model.Email,
+                Contact = model.Contact,
+                Address = model.Address,
+                GSTNumber = model.GSTNumber,
+                FirmName = model.FirmName
             };
 
             _dbContext.Dealers.Add(dealer);

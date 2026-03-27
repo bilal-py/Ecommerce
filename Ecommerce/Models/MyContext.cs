@@ -23,6 +23,15 @@ namespace Ecommerce.Models
                 .HasOne(w => w.Dealer)
                 .WithMany(d => d.Warranties)
                 .HasForeignKey(w => w.DealerId);
+            modelBuilder.Entity<Warranty>()
+                .HasOne(w => w.RegisteredRollNumber)
+                .WithMany()
+                .HasForeignKey(w => w.RollNumber)
+                .HasPrincipalKey(r => r.RollNumber); // important: this is NOT the PK but an alternate key
+
+            modelBuilder.Entity<RegisteredRollNumbers>()
+                .HasAlternateKey(r => r.RollNumber);
+
         }
 
         public DbSet<Cart> Carts { get; set; }
@@ -32,5 +41,6 @@ namespace Ecommerce.Models
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Dealer> Dealers { get; set; }
         public DbSet<Ecommerce.Models.RegisteredRollNumbers> RegisteredRollNumber { get; set; } = default!;
+        public DbSet<EmailLog> EmailLogs { get; set; }
     }
 }

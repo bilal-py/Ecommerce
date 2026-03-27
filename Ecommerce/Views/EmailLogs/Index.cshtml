@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Ecommerce.Models.EmailLog>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+<div class="d-flex justify-content-between">
+    <form asp-action="SendEmails" method="post" class=" align-items-right mt-3">
+        <button type="submit" class="btn btn-secondary m-2" style=" background-color: #6d36e4;">Send Pending Emails</button>
+    </form>
+    <div class=" align-items-right mt-3">
+        <a asp-action="PendingEmailList" class="btn btn-secondary m-2" style=" background-color: #6d36e4;">Pending Email List</a>
+    </div>
+    <div class=" align-items-right mt-3">
+        <a asp-action="Index" class="btn btn-secondary m-2" style=" background-color: #6d36e4;">All Emails Logs</a>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ToEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Body)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmailSent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WarrantyId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ToEmail)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Body)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailSent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WarrantyId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

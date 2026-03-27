@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewData["Title"] = "AccessDenied";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-12 col-lg-8">
+        <div class="container bg-white shadow p-4 rounded" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+            <h3 class="text-center mb-4 fw-bold text-white">Access Denied</h3>
+            <p class="text-center text-white">You do not have permission to access this page.</p>
+        </div>
+    </div>
+</div>
+
+<a style="background-color:white" asp-controller="Home" asp-action="Index">Go back to home</a>

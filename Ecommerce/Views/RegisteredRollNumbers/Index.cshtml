@@ -5,20 +5,28 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@{
+    var categoryNames = new Dictionary<string, string>
+    {
+        { "A", "Prime" },
+        { "B", "Ultimate" },
+        { "C", "Ultimate Plus" }
+    };
 }
-<div class="container-fluid">
-    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
+
+<div class="container-fluid mt-5 pt-2">
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
         <div class="col-md-6">
-            <div class="p-4" style="background-color: #6d36e4; border-radius: 8px; color: white; text-align: center;">
-                <h1 class="my-h1">Registered Roll Numbers: </h1>
+            <div class="p-4" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+                <h1 class="my-h1 text-white">Registered Roll Numbers: </h1>
             </div>
-            <div class="p-4 mt-3"
-                style="background-color: #fff; border-radius: 8px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);">
+            <div class="p-4 mt-3 table-responsive"
+                style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
 
                 <p>
                     <a asp-action="Create" class="btn btn-primary" style="background-color: #6d36e4;">Create New</a>
                 </p>
-                <table class="table">
+                <table class="table text-white">
                     <thead>
                         <tr>
                             <th>
@@ -44,7 +52,10 @@
                                     @Html.DisplayFor(modelItem => item.RollNumber)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Category)
+                                    @if (!string.IsNullOrEmpty(item.Category) && categoryNames.TryGetValue(item.Category, out var friendlyName))
+                                    {
+                                        @Html.DisplayFor(modelItem => @friendlyName)
+                                    }
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.RegistrationDate)

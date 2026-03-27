@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewData["Title"] = "BulkUpdate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Ecommerce.Models.RegisteredRollNumbers
+
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+        <div class="col-md-6">
+            <div class="p-4" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+                <h1 class="my-h1 text-white">Bulk Update Roll Number</h1>
+                <p class="text-white">Note: <i>Paste the roll numbers below with space in between! ( Copy-paste the data from excel ) </i> </p>
+            </div>
+            <div class="p-4 mt-3" style="background: linear-gradient(to right, #1f1f2e, #29293d, #3a2b4f);">
+                <form asp-action="BulkUpdate" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group mt-3 text-white">
+                        <label asp-for="RollNumber" class="control-label"></label>
+                        <input asp-for="RollNumber" class="form-control" />
+                        <span asp-validation-for="RollNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3 text-white">
+                        <label asp-for="Category" class="control-label"></label>
+                        <select asp-for="Category" class="form-control" asp-items="Model.CategoryList">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3  text-white">
+                        <label asp-for="RegistrationDate" class="control-label"></label>
+                        <input asp-for="RegistrationDate" class="form-control" />
+                        <span asp-validation-for="RegistrationDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mt-3 text-white">
+                        <label asp-for="Status" class="control-label"></label>
+                        <input asp-for="Status" class="form-control" />
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3 text-center mt-3">
+                        <input type="submit" value="BulkUpdate" class="btn btn-primary" style="background-color: #6d36e4;" />
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class=" align-items-left mt-3">
+                            <a asp-action="Index" class="btn btn-secondary" style=" background-color: #6d36e4;">Back to List</a>
+                        </div>
+                        <div class=" align-items-right mt-3">
+                            <a asp-action="Create" class="btn btn-secondary" style=" background-color: #6d36e4;">Register Roll Numbers</a>
+                        </div>
+                    </div>
+                </form>
+                              
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Roll Numbers</h5>
+            </div>
+            <div class="modal-body" id="rollNumberList">
+                <!-- Roll numbers will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="cancelButton">Reject</button>
+                <button type="button" class="btn btn-success" id="confirmButton">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // stop default form submit
+            const rollInput = document.querySelector('[name="RollNumber"]').value;
+            const rollList = rollInput.split(/\s+/).filter(x => x);
+            const rollNumberList = document.getElementById("rollNumberList");
+
+            if (rollList.length === 0) {
+                alert("Please enter some roll numbers.");
+                return;
+            }
+
+            rollNumberList.innerHTML = "<ul>" + rollList.map(x => `<li>${x}</li>`).join('') + "</ul>";
+
+            // Show modal
+            $('#confirmModal').modal('show');
+
+            document.getElementById('confirmButton').onclick = () => {
+                $('#confirmModal').modal('hide');
+                e.target.submit(); // submit the form
+            };
+
+            document.getElementById('cancelButton').onclick = () => {
+                $('#confirmModal').modal('hide');
+            };
+        });
+    </script>
+}
